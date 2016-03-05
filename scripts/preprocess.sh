@@ -10,7 +10,7 @@ sh compute_thread_corr.sh 4000 codec-vp9-nexus6.qoe
 python dtree.py svm-vp9-nexus6-correlate.train
 
 # get all thread IDs
-sh get_thread_id.sh sorted.all.nexus6.activem.decoded
+sh get_thread_id.sh sorted.all.nexus6.activem.decoded > all.tid
 
 sh plot_thread.sh 4000 codec-vp9-nexus6.qoe
 
