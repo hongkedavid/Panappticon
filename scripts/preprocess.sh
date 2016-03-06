@@ -5,8 +5,11 @@ sh profile_cpu_lock.sh
 # compute thread-qoe correlation
 sh compute_thread_corr.sh 4000 codec-vp9-nexus6.qoe
 
-# generate SVM/DT training input
+# generate SVM training input
 ./gen_svm_input.sh 4000 codec-vp9-nexus6.qoe svm-vp9-nexus6-correlate.train
+
+# generate DT training input
+./gen_svm_input.sh 4000 codec-vp9-nexus6.qoe svm-vp9-nexus6-train.csv
 python dtree.py svm-vp9-nexus6-correlate.train
 
 # get all thread IDs
