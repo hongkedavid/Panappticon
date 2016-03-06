@@ -10,7 +10,7 @@ sh compute_thread_corr.sh 4000 codec-vp9-nexus6.qoe
 
 # generate DT training input
 ./gen_svm_input.sh 4000 codec-vp9-nexus6.qoe svm-vp9-nexus6-train.csv
-python dtree.py svm-vp9-nexus6-correlate.train
+python dtree.py svm-vp9-nexus6-train.csv
 
 # get all thread IDs
 sh get_thread_id.sh sorted.all.nexus6.activem.decoded > all.tid
