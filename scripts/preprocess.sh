@@ -14,6 +14,7 @@ python dtree.py svm-vp9-nexus6-train.csv
 
 # get all thread IDs
 sh get_thread_id.sh sorted.all.nexus6.activem.decoded > all.tid
+./unify_feature.sh 0 $start $end
 
 sh plot_thread.sh 4000 codec-vp9-nexus6.qoe
 
