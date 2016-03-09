@@ -18,6 +18,9 @@ sh profile_cpu_lock.sh
 python dtree.py svm-vp9-nexus6-train.csv
 
 # plot thread metrics vs. QoE
+sh normalize_thread.sh 0 codec-vp9-nexus6.qoe
+
+# plot distribution
 sh plot_thread.sh 4000 codec-vp9-nexus6.qoe
 
 # profile futex blocking dependency
