@@ -18,7 +18,7 @@ wget https://dl.google.com/dl/android/aosp/qcom-hammerhead-lmy48m-b7143e92.tgz
 tar xf broadcom-hammerhead-lmy48m-5d6ca8e6.tgz
 ./
 
-# replace the kernel and tc source file
+# replace the kernel (location can be found at https://source.android.com/source/building-kernels.html) and tc source file
 cd msm
 cp arch/arm/boot/zImage-dtb android-5.1.1_r14/device/lge/hammerhead-kernel/
 
