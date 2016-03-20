@@ -32,5 +32,5 @@ source build/envsetup.sh
 lunch (aosp_hammerhead-userdebug)
 sudo update-alternatives --config java
 sudo update-alternatives --config javac
-PATH=/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/:$PATH
+PATH=/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin:$PATH
 make -j32
