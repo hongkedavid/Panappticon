@@ -19,7 +19,8 @@ tar xf broadcom-hammerhead-lmy48m-5d6ca8e6.tgz
 ./
 
 # replace the kernel and tc source file
-cp zImage device/
+cd msm
+cp arch/arm/boot/zImage-dtb android-5.1.1_r14/device/lge/hammerhead-kernel/
 
 
 # build Android source
