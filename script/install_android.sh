@@ -18,8 +18,11 @@ wget https://dl.google.com/dl/android/aosp/qcom-hammerhead-lmy48m-b7143e92.tgz
 tar xf broadcom-hammerhead-lmy48m-5d6ca8e6.tgz
 ./
 
-# build Android source
+# replace the kernel and tc source file
 cp zImage device/
+
+
+# build Android source
 source build/envsetup.sh 
 lunch (full_hammerhead-userdebug)
 make -j32
