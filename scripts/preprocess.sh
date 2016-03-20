@@ -17,6 +17,11 @@ sh profile_cpu_lock.sh
 ./gen_svm_input.sh 0 codec-vp9-nexus6.qoe svm-vp9-nexus6-train.csv
 python dtree.py svm-vp9-nexus6-train.csv
 
+# feature selection
+python confounder.py svm-vp9-nexus6-train.csv > confound.out
+python feature_select.py svm-vp9-nexus6-train.csv.thre9 2 > rfe_feature.out
+
+
 # plot thread metrics vs. QoE
 sh normalize_thread.sh 0 codec-vp9-nexus6.qoe
 
