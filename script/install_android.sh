@@ -1,4 +1,5 @@
 # clone a branch of kernel source code from https://android.googlesource.com/kernel 
+# Nexus 5 and Android 5.1.1 as an example
 git clone https://android.googlesource.com/kernel/msm/ -b android-msm-hammerhead-3.4-lollipop-mr1.1
 
 # build the kernel with netem enabled
@@ -23,14 +24,20 @@ tar xf qcom-hammerhead-lmy48m-b7143e92.tgz
 ./extract-qcom-hammerhead.sh
 
 # replace the kernel (location can be found at https://source.android.com/source/building-kernels.html) and tc source file
-cd msm
+cd msm/
 cp arch/arm/boot/zImage-dtb android-5.1.1_r14/device/lge/hammerhead-kernel/
 cp q_netem.c tc.c Android.mk android-5.1.1_r14/external/iproute2/tc/
 
 # build Android source
+cd android-5.1.1_r14/
 source build/envsetup.sh 
 lunch (aosp_hammerhead-userdebug)
 sudo update-alternatives --config java
 sudo update-alternatives --config javac
 PATH=/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin:$PATH
 make -j32
+
+# flash the Android build to device
+cd android-5.1.1_r14/
+adb reboot bootloader
+fastboot flashall -w
