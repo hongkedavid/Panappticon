@@ -19,8 +19,8 @@ python dtree.py svm-vp9-nexus6-train.csv
 
 # feature selection
 python confounder.py svm-vp9-nexus6-train.csv > confound.out
+for line in $(cat confound.out | grep "2011 " | grep -v " 2011 " | cut -d' ' -f2); do p=$(cat feature.mmmm | cut -d'-' -f1 | head -n$(($line+1)) | tail -n1);  cat sorted* | grep THREAD | grep "{\"pid\":$p,"; done
 python feature_select.py svm-vp9-nexus6-train.csv.thre9 2 > rfe_feature.out
-
 
 # plot thread metrics vs. QoE
 sh normalize_thread.sh 0 codec-vp9-nexus6.qoe
