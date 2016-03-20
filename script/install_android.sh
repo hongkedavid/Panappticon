@@ -30,4 +30,7 @@ cp q_netem.c tc.c Android.mk android-5.1.1_r14/external/iproute2/tc/
 # build Android source
 source build/envsetup.sh 
 lunch (aosp_hammerhead-userdebug)
+sudo update-alternatives --config java
+sudo update-alternatives --config javac
+PATH=/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/:$PATH
 make -j32
