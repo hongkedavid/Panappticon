@@ -1,11 +1,15 @@
 # profile thread metrics
-sh filter_proc_tid.sh sorted.all.vp9.nexus6 2278 > codec-vp9-nexus6-active.tid
+file=$(ls sorted.* | head -n1)
+pid=$(cat sorted.* | grep apprtc | head -n1 | cut -d':' -f7 | cut -d',' -f1)
+sh filter_proc_tid.sh $file $pid > codec-vp9-nexus6-active.tid
 sh profile_cpu_lock.sh
 
 # compute thread-qoe correlation
 sh compute_thread_corr.sh 4000 codec-vp9-nexus6.qoe
 
 # profile all thread metrics
+start=$(cat qoe | head -n1 | cut -c 1-10)
+end=$(cat qoe | tail -n1 | cut -c 1-10)
 sh get_thread_id.sh sorted.all.vp9.nexus6 > all.tid
 sh profile_cpu_lock.sh
 ./unify_feature.sh 0 $start $end
