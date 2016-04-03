@@ -1,3 +1,6 @@
+# clear rules
+tc qdisc del dev wlan0 root 
+
 # rate limit uplink/downlink traffic rate to some server
 tc qdisc add dev wlan0 root handle 1: htb default 30
 tc class add dev wlan0 parent 1: classid 1:1 htb rate 1mbit
