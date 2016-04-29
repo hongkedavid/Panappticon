@@ -28,4 +28,5 @@ repo sync
 # Install Eclipse and Android SDK following http://askubuntu.com/questions/318246/complete-installation-guide-for-android-sdk-adt-bundle-on-ubuntu
 cd ~/Downloads
 wget http://dl.google.com/android/android-sdk_r24.4.1-linux.tgz
-
+cd ~/Downloads/android-sdk-linux/tools
+./android
