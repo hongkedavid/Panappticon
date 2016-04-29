@@ -16,6 +16,10 @@ PATH=~/bin:$PATH
 curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
 chmod a+x ~/bin/repo
 
-mkdir panappticon-shamu
 git config --global user.name "xxx"
 git config --global user.email "xxx@gmail.com"
+
+mkdir panappticon-shamu
+cd panappticon-shamu
+repo init -u https://android.googlesource.com/platform/manifest -b android_5.1.1_r14
+repo sync
