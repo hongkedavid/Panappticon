@@ -10,3 +10,12 @@ sudo chmod a+r /etc/udev/rules.d/51-android.rules
 sudo service udev restart
 
 sudo apt-get install android-tools-adb android-tools-fastboot
+
+mkdir ~/bin
+PATH=~/bin:$PATH
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+chmod a+x ~/bin/repo
+
+mkdir panappticon-shamu
+git config --global user.name "xxx"
+git config --global user.email "xxx@gmail.com"
