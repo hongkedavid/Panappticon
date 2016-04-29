@@ -9,6 +9,7 @@ sudo wget -S -O - http://source.android.com/source/51-android.rules | sed "s/<us
 sudo chmod a+r /etc/udev/rules.d/51-android.rules
 sudo service udev restart
 
+# http://bernaerts.dyndns.org/linux/74-ubuntu/328-ubuntu-trusty-android-adb-fastboot-qtadb
 sudo apt-get install android-tools-adb android-tools-fastboot
 
 mkdir ~/bin
