@@ -5,9 +5,10 @@ sudo apt-get install vim git-core gnupg flex bison gperf build-essential \
   lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache \
   libgl1-mesa-dev libxml2-utils xsltproc unzip abootimg openjdk-7-jdk
   
-sudo wget -S -O - http://source.android.com/source/51-android.rules | sed "s/<username>/$USER/" | sudo tee >/dev/null /etc/udev/rules.d/51-android.rules; sudo udevadm control --reload-rules
-sudo chmod a+r /etc/udev/rules.d/51-android.rules
-sudo service udev restart
+sudo su;
+wget -S -O - http://source.android.com/source/51-android.rules | sed "s/<username>/$USER/" | sudo tee >/dev/null /etc/udev/rules.d/51-android.rules; sudo udevadm control --reload-rules
+chmod a+r /etc/udev/rules.d/51-android.rules
+service udev restart
 
 # http://bernaerts.dyndns.org/linux/74-ubuntu/328-ubuntu-trusty-android-adb-fastboot-qtadb
 sudo apt-get install android-tools-adb android-tools-fastboot
