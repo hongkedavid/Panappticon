@@ -6,5 +6,5 @@ install.packages("pcalg")
 # If so, install graph and RBGL
 source("http://bioconductor.org/biocLite.R") 
 biocLite("RBGL")
-#browseVignettes("graph")
+biocLite("Rgraphviz")
 install.packages("pcalg")
