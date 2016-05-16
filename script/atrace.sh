@@ -1,3 +1,5 @@
+# source code of atrace at http://androidxref.com/4.4.4_r1/xref/frameworks/native/cmds/atrace/atrace.cpp for Android 4.4.4 KitKat
+
 # enable sched, binder event tracing
 echo 1 > /sys/kernel/debug/tracing/events/sched/enable
 echo 1 > /sys/kernel/debug/tracing/events/binder/enable
