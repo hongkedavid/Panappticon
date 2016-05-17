@@ -1,5 +1,9 @@
 # source code of atrace at http://androidxref.com/4.4.4_r1/xref/frameworks/native/cmds/atrace/atrace.cpp for Android 4.4.4 KitKat
 
+su 
+echo 1 > /sys/kernel/debug/tracing/events/enable 
+atrace -t 10 gfx view sched wm am sched video mmc freq idle audio disk input hal dalvik > /sdcard/atrace.dump &
+
 # start tracing for 10 sec with buffer size 100MB (2MB by default)
 su 
 echo 1 > /sys/kernel/debug/tracing/events/enable 
