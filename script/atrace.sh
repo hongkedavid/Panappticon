@@ -1,6 +1,7 @@
 # source code of atrace at http://androidxref.com/4.4.4_r1/xref/frameworks/native/cmds/atrace/atrace.cpp for Android 4.4.4 KitKat
 
 # start tracing for 10 sec with buffer size 100MB (2MB by default)
+su 
 echo 1 > /sys/kernel/debug/tracing/events/enable 
 atrace -t 25 -b 102400 > /sdcard/atrace.dump &
 
