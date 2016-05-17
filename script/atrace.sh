@@ -2,7 +2,7 @@
 
 su 
 echo 1 > /sys/kernel/debug/tracing/events/enable 
-atrace -t 10 gfx view sched wm am sched video mmc freq idle audio disk input hal dalvik > /sdcard/atrace.dump &
+atrace -t 10 gfx view sched wm am sched video freq idle audio disk input hal dalvik > /sdcard/atrace.dump &
 
 # start tracing for 10 sec with buffer size 100MB (2MB by default)
 su 
