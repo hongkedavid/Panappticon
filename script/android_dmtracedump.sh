@@ -1,4 +1,4 @@
-adb shell setprop dalvik.vm.extra-opts -Xprofile:dualclock
+#adb shell setprop dalvik.vm.extra-opts -Xprofile:dualclock
 monitor
 
 dmtracedump -o $1.trace > $1.dump
