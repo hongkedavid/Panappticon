@@ -4,6 +4,7 @@
 monitor
 
 # Alternatively, run traceview from command
+adb shell rm /sdcard/$file
 adb shell am profile start $pid /sdcard/$file; adb shell date
 adb shell am profile stop $pid; adb shell date
 
