@@ -4,8 +4,8 @@
 monitor
 
 # Alternatively, run traceview from command
-adb shell am profile com.example.app profile start /sdcard/trace_file
-adb shell am profile com.example.app profile stop
+adb shell am profile start $pid /sdcard/$file; adb shell date
+adb shell am profile stop $pid; adb shell date
 
 dmtracedump -o $1.trace > $1.dump
 dmtracedump -o -g $1.png $1.trace > $1.profile
