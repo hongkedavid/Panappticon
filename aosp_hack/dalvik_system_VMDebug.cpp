@@ -1,4 +1,9 @@
-// Hack for dalvik/vm/native/dalvik_system_VMDebug.cpp in AOSP 4.4.4-r1
+/*
+** Enabling method profiling with fixed sampling interval (10000us) by default from command line: 
+**      am profile start $pid /sdcard/$file; 
+** Hack for dalvik/vm/native/dalvik_system_VMDebug.cpp in AOSP 4.4.4-r1
+** Ref: http://blog.csdn.net/ny_mg/article/details/38345483
+*/
 
 /*
  * Copyright (C) 2008 The Android Open Source Project
