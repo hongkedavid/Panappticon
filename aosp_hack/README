@@ -1,0 +1,1 @@
+We hacked Android's built-in profiler (for the codebase AOSP 4.4.4 and 5.1.1) to automate app profiling in sampling mode.
