@@ -1,2 +1,8 @@
 We hacked Android's built-in profiler (for the codebase AOSP 4.4.4 and 5.1.1) to automate app profiling in sampling mode.
 We also hacked Android's dmtracedump utility to obtain elapsed wall clock time.
+
+To build the profiler for AOSP 4.4.4:
+    mmm dalvik/vm; mmm frameworks/base/cmds/am; mmm frameworks/base
+     
+To build the profiler for AOSP 5.1.1:
+    mmm frameworks/base/cmds/am
