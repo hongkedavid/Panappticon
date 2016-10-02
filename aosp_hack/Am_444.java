@@ -1,6 +1,6 @@
 /*
 ** Enabling method profiling with configurable sampling interval (0 for tracing mode) from command line: 
-**      am profile start $pid $sample-interval /sdcard/$file; 
+**      am profile start $pid $sample-interval /sdcard/$file
 ** Hack for frameworks/base/cmds/am/src/com/android/commands/am/Am.java in AOSP 4.4.4-r1 
 */
 
