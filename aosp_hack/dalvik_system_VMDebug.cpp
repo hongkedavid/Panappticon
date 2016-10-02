@@ -262,7 +262,7 @@ static void Dalvik_dalvik_system_VMDebug_startMethodTracingFd(const u4* args,
     Object* traceFd = (Object*) args[1];
     int bufferSize = args[2];
     int flags = args[3];
-
+    
     int origFd = getFileDescriptor(traceFd);
     if (origFd < 0)
         RETURN_VOID();
@@ -279,9 +279,10 @@ static void Dalvik_dalvik_system_VMDebug_startMethodTracingFd(const u4* args,
         RETURN_VOID();
     }
 
-    // David's hack to enable sampling mode by default
-    dvmMethodTraceStart(traceFileName, fd, bufferSize, flags, false, true, 10000);
-    //dvmMethodTraceStart(traceFileName, fd, bufferSize, flags, false, false, 0);
+    // David's hack to enable sampling mode 
+    ALOGI("startMethodTracingFd %s", traceFileName);
+    //dvmMethodTraceStart(traceFileName, fd, bufferSize, flags, false, true, 10000);
+    dvmMethodTraceStart(traceFileName, fd, bufferSize, flags, false, false, 0);
     free(traceFileName);
     RETURN_VOID();
 }
@@ -304,11 +305,53 @@ static void Dalvik_dalvik_system_VMDebug_startMethodTracingFilename(const u4* ar
         RETURN_VOID();
     }
 
-    // David's hack to enable sampling mode by default
+    // David's hack to enable sampling mode 
+    ALOGI("startMethodTracingFilename %s", traceFileName);
     dvmMethodTraceStart(traceFileName, -1, bufferSize, flags, false, true, 10000);
     //dvmMethodTraceStart(traceFileName, -1, bufferSize, flags, false, false, 0);
     free(traceFileName);
     RETURN_VOID();
+}
+
+/*
+ * static void startMethodTracingFdSampling(String traceFileName, FileDescriptor fd,
+ *     int bufferSize, int flags, boolean samplingEnabled, int intervalUs))
+ *
+ * Start method trace profiling in sampling mode, sending results to a file descriptor.
+ */
+static void Dalvik_dalvik_system_VMDebug_startMethodTracingFdSampling(const u4* args,
+    JValue* pResult)
+{
+    StringObject* traceFileStr = (StringObject*) args[0];
+    Object* traceFd = (Object*) args[1];
+    int bufferSize = args[2];
+    int flags = args[3];
+    bool samplingEnabled = args[4];
+    int intervalUs = args[5];
+
+    int origFd = getFileDescriptor(traceFd);
+    if (origFd < 0)
+        RETURN_VOID();
+
+    int fd = dup(origFd);
+    if (fd < 0) {
+        dvmThrowExceptionFmt(gDvm.exRuntimeException,
+            "dup(%d) failed: %s", origFd, strerror(errno));
+        RETURN_VOID();
+    }
+
+    char* traceFileName = dvmCreateCstrFromString(traceFileStr);
+    if (traceFileName == NULL) {
+        RETURN_VOID();
+    }
+
+    // David's hack to enable sampling mode 
+    ALOGI("startMethodTracingFdSampling %s %d %d", traceFileName, (int)samplingEnabled, intervalUs);
+    dvmMethodTraceStart(traceFileName, fd, bufferSize, flags, false, samplingEnabled, intervalUs);
+    //dvmMethodTraceStart(traceFileName, fd, bufferSize, flags, false, false, 0);
+    free(traceFileName);
+    RETURN_VOID();
+
 }
 
 /*
@@ -838,6 +881,8 @@ const DalvikNativeMethod dvm_dalvik_system_VMDebug[] = {
         Dalvik_dalvik_system_VMDebug_startMethodTracingFd },
     { "startMethodTracingFilename", "(Ljava/lang/String;II)V",
         Dalvik_dalvik_system_VMDebug_startMethodTracingFilename },
+    { "startMethodTracingFdSampling",       "(Ljava/lang/String;Ljava/io/FileDescriptor;IIZI)V",
+        Dalvik_dalvik_system_VMDebug_startMethodTracingFdSampling },
     { "getMethodTracingMode",       "()I",
         Dalvik_dalvik_system_VMDebug_getMethodTracingMode },
     { "stopMethodTracing",          "()V",
