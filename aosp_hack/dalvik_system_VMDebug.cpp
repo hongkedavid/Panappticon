@@ -1,6 +1,6 @@
 /*
-** Enabling method profiling with configurable sampling interval from command line: 
-**      am profile start $pid $sampling_interval /sdcard/$file; 
+** Enabling method profiling with configurable sampling interval (0 for tracing mode) from command line: 
+**      am profile start $pid $sample-interval /sdcard/$file
 ** Hack for dalvik/vm/native/dalvik_system_VMDebug.cpp in AOSP 4.4.4-r1
 ** Ref: http://blog.csdn.net/ny_mg/article/details/38345483
 */
