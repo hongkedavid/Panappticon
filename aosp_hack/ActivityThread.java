@@ -1,7 +1,7 @@
 /*
 ** Enabling method profiling with configurable sampling interval (0 for tracing mode) from command line: 
 **      am profile start $pid $sample-interval /sdcard/$file
-** Hack for frameworks/base/core/java/android/app/ActivityThread.java
+** Hack for frameworks/base/core/java/android/app/ActivityThread.java in AOSP 4.4.4-r1
 ** Ref: http://blog.csdn.net/ny_mg/article/details/38345483
 */
 
