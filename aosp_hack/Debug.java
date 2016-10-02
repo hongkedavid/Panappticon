@@ -1,4 +1,11 @@
 /*
+** Enabling method profiling with configurable sampling interval (0 for tracing mode) from command line: 
+**      am profile start $pid $sample-interval /sdcard/$file
+** Hack for frameworks/base/core/java/android/os/Debug.java in AOSP 4.4.4-r1
+** Ref: http://blog.csdn.net/ny_mg/article/details/38345483
+*/
+
+/*
  * Copyright (C) 2007 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
