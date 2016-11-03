@@ -26,7 +26,7 @@ tar xf qcom-hammerhead-lmy48m-b7143e92.tgz
 # replace the kernel (location can be found at https://source.android.com/source/building-kernels.html) and tc source file
 cd msm/
 cp arch/arm/boot/zImage-dtb android-5.1.1_r14/device/lge/hammerhead-kernel/
-cp q_netem.c tc.c Android.mk android-5.1.1_r14/external/iproute2/tc/
+cp tc/q_netem.c tc/tc.c tc/Android.mk android-5.1.1_r14/external/iproute2/tc/
 
 # build Android source
 cd android-5.1.1_r14/
