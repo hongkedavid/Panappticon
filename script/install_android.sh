@@ -8,6 +8,8 @@ make hammerhead_defconfig
 make -j32
 
 # clone a branch of Android source code based on https://source.android.com/source/build-numbers.html
+make android-5.1.1_r14
+cd android-5.1.1_r14/
 repo init -u https://android.googlesource.com/platform/manifest -b android-5.1.1_r14
 repo sync
 
