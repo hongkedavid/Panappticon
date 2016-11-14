@@ -125,10 +125,10 @@ def getClickableItems():
                 getClickableItems()
                 '''
                 curr_click[curr_root] = 0
-                print "Add page"
+                print "Add page explored"
                 page_stack.append(curr_root)
              else:
-                print "Add page"
+                print "Add page unexplored"
                 page_stack.append(curr_root)
           else:
              # curr_root is a new page
