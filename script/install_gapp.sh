@@ -10,4 +10,4 @@ adb push open_gapps.zip /sdcard/
 adb reboot recovery
 
 # Use the default setting (just swipping to confirm and go to next) and Choose "install zip" to install the Open Gapps zip file
-# After installation is done, click "Reboot to system" to reboot
+# After installation is done, click "Reboot system" to reboot
