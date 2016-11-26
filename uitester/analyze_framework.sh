@@ -7,6 +7,12 @@ adb pull /sdcard/$tid.tcpdump .
 mkdir user 
 mkdir kernel
 
+# Get lantecy data
+cat logcat | grep "$tid): triggerGl\|translateCommand" > $tid.logcat.out
+cut -d' ' -f2 $tid.logcat.out > tmp.1
+cut -d':' -f4 $tid.logcat.out | cut -d' ' -f2 > tmp.2
+paste -d',' tmp.1 tmp.2 > tmp.3
+
 # Parse method and OS trace
 ./parse_event.sh
 
