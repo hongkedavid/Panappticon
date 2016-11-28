@@ -29,9 +29,26 @@ do
             break; 
         fi;
     done
-    echo $f; 
-    cat thread_name.out | head -n$c2 | tail -n$(($c2-$c1)) | grep "pool\-" | grep "thread\-\"\|thread\""; 
+    echo $f
+    j=1
+    rm javacron.tid
+    for l in $(cat $f | grep JavaCron | cut -d' ' -f1); 
+    do 
+        tt=$(cat thread_name.out | head -n$c2 | tail -n$(($c2-$c1)) | grep "pool\-" | grep "thread\-\"\|thread\"" | head -n$j | tail -n1);
+        echo "$l $(cat $f | grep "$l ent" | head -n1 | cut -c18-25)" >> javacron.tid;
+    done
+    rm ssl.thread.$(echo $f | cut -d'.' -f2) 
+    for l in $(sort -n -k2 javacron.tid | sed 's/ /,/g');
+    do
+        tt=$(cat thread_name.out | head -n$c2 | tail -n$(($c2-$c1)) | grep "pool\-" | grep "thread\-\"\|thread\"" | head -n$j | tail -n1);
+        ttid=$(echo $tt | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1);
+        start_sec=$(echo $tt | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1);
+        start_usec=$(echo $tt | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1);
+        echo "$(echo $l | cut -d',' -f1),$(echo $l | cut -d',' -f2),$ttid,$start_sec,$start_usec" >> ssl.thread.$(echo $f | cut -d'.' -f2) 
+        j=$(($j+1))
+    done; 
 done
+rm javacron.tid
 
 # Extract relevant intervals
 
