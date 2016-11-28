@@ -13,6 +13,11 @@ cut -d' ' -f2 $tid.logcat.out > tmp.1
 cut -d':' -f4 $tid.logcat.out | cut -d' ' -f2 > tmp.2
 paste -d',' tmp.1 tmp.2 > tmp.3
 
+for i in $(ls $tid.*.tracedump | cut -d'.' -f2 | sort -n); do echo $i >> tmp; done
+cut -d' ' -f3 $tid.logcat.stat > tmp.1
+paste -d' ' tmp tmp.1 > $tid.latency
+rm tmp tmp.1
+
 # Parse method and OS trace
 ./parse_event.sh
 
