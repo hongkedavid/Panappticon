@@ -48,6 +48,9 @@ cat thread_name.out | grep "IntentService\[R" > intent.thread
 for line in $(cat intent.thread); do t=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); if [ $(cat fork.tid | grep "{\"pid\":$t," | wc -l) -gt 0 ]; then echo $line; fi; done > intent.thread.tmp
 mv intent.thread.tmp intent.thread
 
+# Picasso-Idle: Thread-xxx
+# Retrofit-Idle: "pool-xxx-thread-xxx 
+
 k=1
 for line in $(cat nexus4.offerup.ui); 
 do 
