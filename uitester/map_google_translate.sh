@@ -87,9 +87,9 @@ do
             cat sslthread.$i | head -n1
             cat sslthread.$i | tail -n1
             ./profile_resource.sh sslthread.$i
-           cat sslthread.$i.cpu | python extractCPUResource.py $ptid >> $i.cpu_stat
-           cat sslthread.$i.sock | python extractIOResource.py $ptid >> $i.sock_stat
-           cat sslthread.$i.disk | python extractIOResource.py $ptid >> $i.disk_stat
+            cat sslthread.$i.cpu | python extractCPUResource.py $ptid >> $i.cpu_stat
+            cat sslthread.$i.sock | python extractIOResource.py $ptid >> $i.sock_stat
+            cat sslthread.$i.disk | python extractIOResource.py $ptid >> $i.disk_stat
         done
     done
 done
