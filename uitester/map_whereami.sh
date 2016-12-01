@@ -55,10 +55,10 @@ for i in $(cat whereami.latency | cut -d' ' -f1);
 do
     rm $i.cpu_stat $i.sock_stat $i.disk_stat
     t=1
-    ptid=6989
+    ptid=1793
     cat trace.$i | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" > tmp.trace
-    cat $t.$i.out | grep $func | grep "$t ent" | cut -c18-25 > tmp.1
-    cat $t.$i.out | grep $func | grep "$t xit" | cut -c18-25 > tmp.2
+    cat $t.$i.out | grep $func | grep "$t ent" | cut -c18-25 | sed 's/ //g' > tmp.1
+    cat $t.$i.out | grep $func | grep "$t xit" | cut -c18-25 | sed 's/ //g' > tmp.2
     paste -d',' tmp.1 tmp.2 > tmp.3
     start=$(grep "PerformClick.run" $t.$i.out | head -n1 | cut -c17-25 | sed 's/ //g')
     psec=$(cat nexus4.whereami.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
@@ -74,6 +74,8 @@ do
         e2=$(($(($(($psec*1000000))+$pusec+$e-$start))%1000000))
         echo $s1, $s2, $e1, $e2
         cat tmp.trace | python GrepTrace.py $s1 $s2 $e1 $e2 > msgthread.$i
+        cat msgthread.$i | head -n1
+        cat msgthread.$i | tail -n1
         ./profile_resource.sh msgthread.$i
         cat msgthread.$i.cpu | python extractCPUResource.py $ptid >> $i.cpu_stat
         cat msgthread.$i.sock | python extractIOResource.py $ptid >> $i.sock_stat
