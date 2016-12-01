@@ -49,7 +49,14 @@ for line in $(cat intent.thread); do t=$(echo $line | cut -d'{' -f4 | cut -d':' 
 mv intent.thread.tmp intent.thread
 
 # Picasso-Idle: Thread-xxx
-# Retrofit-Idle: "pool-xxx-thread-xxx 
+# Retrofit-Idle: pool-xxx-thread-xxx 
+for f in $(cat trace.10 | grep -v 1479761249 | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq); 
+for f in $(cat trace.20 | grep -v 1479762443 | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq); 
+do 
+    if [ $(cat fork.tid | grep "{\"pid\":$f," | wc -l) -gt 0 ]; then 
+       cat fork.tid | grep "{\"pid\":$f,"; cat thread_name.out | grep "{\"pid\":$f," | head -n1; 
+    fi; 
+done
 
 k=1
 for line in $(cat nexus4.offerup.ui); 
