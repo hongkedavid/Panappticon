@@ -17,10 +17,11 @@ mv sorted.thread_name.out thread_name.out
 cat $file | grep FORK | grep "tgid\":$tid}}" > fork.tid
 ./sort_json.sh fork.tid
 mv sorted.fork.tid fork.tid
+
 for f in $(ls $tid.*traceview); 
 do 
     n1=$(echo $f | cut -d'.' -f2)
-    tname=$(grep S3LibThread $f | head -n2 | tail -n1 | cut -d' ' -f2); 
+    tname=$(grep S3LibThread $f | grep -v S3LibThread-4 | head -n1 | tail -n1 | cut -d' ' -f2); 
     l=$(grep -n "$tname\"" thread_name.out | head -n1); c1=$(echo $l | cut -d':' -f1); 
     t=$(echo $l | cut -d':' -f5 | cut -d',' -f1); 
     for ((i=10;i<=15;i=i+1)); 
