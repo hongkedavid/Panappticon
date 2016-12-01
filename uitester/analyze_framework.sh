@@ -43,3 +43,8 @@ mv dtree.csv.tmp dtree.csv
 python dtree.py dtree.csv
 
 # Analyze relevant resource factors for each critical method
+paste -d' ' tmp resource.csv > resource.csv.tmp
+sed 's/ /,/g' resource.csv.tmp > resource.csv
+rm resource.csv.tmp
+echo "label,cpu_run,cpu_wait,cpu_sleep,sock,disk" > feature.meta 
+python dtree.py resource.csv
