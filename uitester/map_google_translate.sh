@@ -17,8 +17,9 @@ mv sorted.thread_name.out thread_name.out
 cat $file | grep FORK | grep "tgid\":$tid}}" > fork.tid
 ./sort_json.sh fork.tid
 mv sorted.fork.tid fork.tid
-for f in $(ls $tid.*traceview); 
+for f in $(ls $tid.51.*traceview); 
 do 
+    n1=$(echo $f | cut -d'.' -f2)
     tname=$(grep S3LibThread $f | head -n2 | tail -n1 | cut -d' ' -f2); 
     l=$(grep -n "$tname\"" thread_name.out | head -n1); c1=$(echo $l | cut -d':' -f1); 
     t=$(echo $l | cut -d':' -f5 | cut -d',' -f1); 
@@ -34,6 +35,7 @@ do
     rm javacron.tid
     for l in $(cat $f | grep JavaCron | cut -d' ' -f1); 
     do 
+        if [ ! -e $l.$n1.out ]; then continue; fi
         tt=$(cat thread_name.out | head -n$c2 | tail -n$(($c2-$c1)) | grep "pool\-" | grep "thread\-\"\|thread\"" | head -n$j | tail -n1);
         echo "$l $(cat $f | grep "$l ent" | head -n1 | cut -c18-25)" >> javacron.tid;
     done
