@@ -70,8 +70,8 @@ do
         cat nexus4.kernel.translate.decoded | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" | grep "sec\":$trange" > tmp.trace
         ./sort_json.sh tmp.trace
         mv sorted.tmp.trace tmp.trace
-        cat $t.$i.out | grep SSL_read | grep "$t ent" | cut -c18-25 > tmp.1
-        cat $t.$i.out | grep SSL_read | grep "$t xit" | cut -c18-25 > tmp.2
+        cat $t.$i.out | grep SSL_read | grep "$t ent" | cut -c18-25 | sed 's/ //g' > tmp.1
+        cat $t.$i.out | grep SSL_read | grep "$t xit" | cut -c18-25 | sed 's/ //g' > tmp.2
         paste -d',' tmp.1 tmp.2 > tmp.3
         for l in $(cat tmp.3);
         do
