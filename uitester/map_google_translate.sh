@@ -17,7 +17,7 @@ mv sorted.thread_name.out thread_name.out
 cat $file | grep FORK | grep "tgid\":$tid}}" > fork.tid
 ./sort_json.sh fork.tid
 mv sorted.fork.tid fork.tid
-for f in $(ls $tid.51.*traceview); 
+for f in $(ls $tid.*traceview); 
 do 
     n1=$(echo $f | cut -d'.' -f2)
     tname=$(grep S3LibThread $f | head -n2 | tail -n1 | cut -d' ' -f2); 
