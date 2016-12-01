@@ -13,9 +13,10 @@ do
 done > sslread.thread
 
 # Get input timestamp
-cat nexus4.user.offerup.decoded | grep UI_INPUT > nexus4.offerup.ui; ./sort_json.sh nexus4.offerup.ui
-for ((i=5;i<=$(cat nexus4.offerup.ui | wc -l);i=i+3)); do cat nexus4.offerup.ui | head -n$i | tail -n1 >> nexus4.offerup.ui.tmp; done
-mv nexus4.offerup.ui.tmp nexus4.offerup.ui
+file="nexus4.offerup.ui"
+cat nexus4.user.offerup.decoded | grep UI_INPUT > $file; ./sort_json.sh nexus4.offerup.ui
+for ((i=5;i<=$(cat $file | wc -l);i=i+3)); do cat $file | head -n$i | tail -n1 >> $file.tmp; done
+mv $file.tmp $file
 
 file="nexus4.kernel.offerup.decoded"
 cat $file | grep THREAD > thread_name.out
