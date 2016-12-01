@@ -81,7 +81,10 @@ do
             s2=$(($(($(($psec*1000000))+$pusec+$s-$start))%1000000))
             e1=$(($(($(($psec*1000000))+$pusec+$e-$start))/1000000))
             e2=$(($(($(($psec*1000000))+$pusec+$e-$start))%1000000))
+            echo $s1, $s2, $e1, $e2
             cat tmp.trace | python GrepTrace.py $s1 $s2 $e1 $e2 > sslthread.$i
+            cat sslthread.$i | head -n1
+            cat sslthread.$i | tail -n1
             ./profile_resource.sh sslthread.$i
            cat sslthread.$i.cpu | python extractCPUResource.py $ptid >> $i.cpu_stat
            cat sslthread.$i.sock | python extractIOResource.py $ptid >> $i.sock_stat
