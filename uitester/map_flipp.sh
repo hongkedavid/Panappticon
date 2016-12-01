@@ -99,3 +99,21 @@ do
          echo "$ttid,$ans" >> connect.thread.$a
      done
 done
+
+
+k=1
+for line in $(cat nexus4.flipp.ui); 
+do 
+    a=$(echo $line | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1); 
+    b=$(echo $line | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1); 
+    s=$(($(($a*1000000))+$b))
+    b=$(cat flipp.latency | head -n$k | tail -n1 | cut -d' ' -f2)
+    c=$(cat flipp.latency | head -n$k | tail -n1 | cut -d' ' -f1)
+    e=$(($(($s+$(($b*1000))))/1000000))    
+    echo $a, $e
+    rm trace.$c
+    for ((i=$a;i<=$e;i=i+1)); do cat nexus4.flipp.decoded | grep "sec\":$i," >> trace.$c; done
+    ./sort_json.sh trace.$c
+    mv sorted.trace.$c trace.$c
+    k=$(($k+1))
+done
