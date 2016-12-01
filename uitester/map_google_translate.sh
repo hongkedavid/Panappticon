@@ -1,3 +1,4 @@
+# label by median + 2*std  
 tid=3203
 func="SSL_read"
 for f in $(ls $tid.*traceview); 
