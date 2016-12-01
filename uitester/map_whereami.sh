@@ -46,3 +46,65 @@ do
     mv sorted.trace.$c trace.$c
     k=$(($k+1))
 done
+
+
+# Extract relevant intervals and compute resource features  
+func="MessageQueue.next"
+k=1
+for i in $(cat whereami.latency | cut -d' ' -f1);
+do
+    rm $i.cpu_stat $i.sock_stat $i.disk_stat
+    t=1
+    ptid=6989
+    cat trace.$i | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" > tmp.trace
+    cat $t.$i.out | grep $func | grep "$t ent" | cut -c18-25 > tmp.1
+    cat $t.$i.out | grep $func | grep "$t xit" | cut -c18-25 > tmp.2
+    paste -d',' tmp.1 tmp.2 > tmp.3
+    start=$(grep "PerformClick.run" $t.$i.out | head -n1 | cut -c17-25 | sed 's/ //g')
+    psec=$(cat nexus4.whereami.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+    pusec=$(cat nexus4.whereami.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1)
+    echo $t, $start, $ptid, $psec, $pusec
+    for l in $(cat tmp.3);
+    do
+        s=$(echo $l | cut -d',' -f1)
+        e=$(echo $l | cut -d',' -f2)
+        s1=$(($(($(($psec*1000000))+$pusec+$s-$start))/1000000))
+        s2=$(($(($(($psec*1000000))+$pusec+$s-$start))%1000000))
+        e1=$(($(($(($psec*1000000))+$pusec+$e-$start))/1000000))
+        e2=$(($(($(($psec*1000000))+$pusec+$e-$start))%1000000))
+        echo $s1, $s2, $e1, $e2
+        cat tmp.trace | python GrepTrace.py $s1 $s2 $e1 $e2 > msgthread.$i
+        ./profile_resource.sh msgthread.$i
+        cat msgthread.$i.cpu | python extractCPUResource.py $ptid >> $i.cpu_stat
+        cat msgthread.$i.sock | python extractIOResource.py $ptid >> $i.sock_stat
+        cat msgthread.$i.disk | python extractIOResource.py $ptid >> $i.disk_stat
+    done
+    k=$(($k+1))
+done
+rm tmp.1 tmp.2 tmp.3 tmp.trace 
+rm resource.csv
+for t in $(cat whereami.latency | cut -d' ' -f1);
+do
+   for ((j=2;j<=4;j=j+1));
+   do
+        c=0;
+        for f in $(cat $t.cpu_stat | cut -d' ' -f$j);
+        do
+            c=$(($c+$f));
+        done;
+        echo -n "$c " >> resource.csv;
+    done;
+    c=0;
+    for f in $(cat $t.sock_stat | cut -d' ' -f2);
+    do
+        c=$(($c+$f));
+    done;
+    echo -n "$c " >> resource.csv;
+    c=0
+    for f in $(cat $t.disk_stat | cut -d' ' -f2);
+    do
+        c=$(($c+$f));
+    done;
+    echo -n "$c" >> resource.csv;
+    echo "" >> resource.csv;
+done
