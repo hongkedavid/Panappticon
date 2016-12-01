@@ -83,6 +83,7 @@ do
         cat msgthread.$i.disk | python extractIOResource.py $ptid >> $i.disk_stat
     done
     k=$(($k+1))
+    rm msgthread.$i
 done
 rm tmp.1 tmp.2 tmp.3 tmp.trace 
 rm resource.csv
