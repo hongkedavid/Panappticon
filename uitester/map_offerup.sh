@@ -14,7 +14,7 @@ done > sslread.thread
 
 # Get input timestamp
 file="nexus4.offerup.ui"
-cat nexus4.user.offerup.decoded | grep UI_INPUT > $file; ./sort_json.sh nexus4.offerup.ui
+cat nexus4.user.offerup.decoded | grep UI_INPUT > $file; ./sort_json.sh $file
 for ((i=5;i<=$(cat $file | wc -l);i=i+3)); do cat $file | head -n$i | tail -n1 >> $file.tmp; done
 mv $file.tmp $file
 
