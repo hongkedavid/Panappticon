@@ -1,3 +1,4 @@
+# Label by median + std
 tid=1793
 
 file="nexus4.kernel.whereami.decoded"
