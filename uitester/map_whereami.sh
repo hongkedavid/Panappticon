@@ -8,6 +8,10 @@ cat $file | grep FORK | grep ",\"tgid\":$tid}}" > fork.tid
 ./sort_json.sh fork.tid
 mv sorted.fork.tid fork.tid
 
+cat nexus4.user.whereami.decoded | grep UI_INPUT > nexus4.whereami.ui
+./sort_json.sh nexus4.whereami.ui
+mv sorted.nexus4.whereami.ui nexus4.whereami.ui 
+
 
 # Extract relevant thread
 func="MessageQueue.next"
@@ -20,10 +24,11 @@ do
          cat $f | grep "$t " | head -n1; 
      done
 done > msgqueue.thread
+for f in $(cat thread_name.out | grep "Thread\-192" | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); 
+do 
+     cat fork.tid | grep "{\"pid\":$f,"; 
+done > msgqueue.map
 
-cat nexus4.user.whereami.decoded | grep UI_INPUT > nexus4.whereami.ui
-./sort_json.sh nexus4.whereami.ui
-mv sorted.nexus4.whereami.ui nexus4.whereami.ui 
 
 k=1
 for line in $(cat nexus4.whereami.ui); 
