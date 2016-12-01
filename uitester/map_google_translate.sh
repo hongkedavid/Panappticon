@@ -92,7 +92,9 @@ do
             cat sslthread.$i.disk | python extractIOResource.py $ptid >> $i.disk_stat
         done
     done
+    rm sslthread.$i
 done
+rm tmp.trace tmp.1 tmp.2 tmp.3
 for t in $(ls ssl.thread.* | cut -d'.' -f3 | sort -n);
 do
    for ((j=2;j<=4;j=j+1));
