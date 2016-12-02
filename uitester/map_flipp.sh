@@ -125,9 +125,9 @@ done
 # Extract relevant intervals and compute resource features  
 func="SSL_read"
 k=1
-for f in $(ls ssl.thread.*);
+for i in $(ls ssl.thread.* | cut -d'.' -f3 | sort -n);
 do
-    i=$(echo $f | cut -d'.' -f3)
+    f="ssl.thread.$i"
     rm $i.cpu_stat $i.sock_stat $i.disk_stat
     for line in $(cat $f);
     do
