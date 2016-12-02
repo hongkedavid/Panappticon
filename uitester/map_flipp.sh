@@ -67,11 +67,12 @@ do
          ttid=$(cat $f | grep "$t " | head -n1 | cut -d' ' -f1)
          tname=$(cat $f | grep "$t " | head -n1 | sed 's/ /,/g' | cut -d',' -f2- | sed 's/,//g')
          min_gap=10000000000
+         ans=""
          for l in $(cat sslread.map | grep "$tname:");
          do
              ptsec=$(echo $l | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
              ptid=$(echo $l | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1)
-             if [ $(($ptsec-$isec)) -gt 0 ] && [ $(($ptsec-$isec)) -lt 5 ]; then ans=$ptid; break; fi
+             if [ $(($ptsec-$isec)) -ge 0 ] && [ $(($ptsec-$isec)) -lt 5 ]; then ans=$ptid; break; fi
              if [ $(($isec-$ptsec)) -gt 0 ] && [ $(($isec-$ptsec)) -lt $min_gap ]; then ans=$ptid; min_gap=$(($isec-$ptsec)); fi             
          done
          echo "$ttid,$ans" >> ssl.thread.$a
@@ -90,11 +91,12 @@ do
          ttid=$(cat $f | grep "$t " | head -n1 | cut -d' ' -f1)
          tname=$(cat $f | grep "$t " | head -n1 | sed 's/ /,/g' | cut -d',' -f2- | sed 's/,//g')
          min_gap=10000000000
+         ans=""
          for l in $(cat connect.map | grep "$tname:");
          do
              ptsec=$(echo $l | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
              ptid=$(echo $l | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1)
-             if [ $(($ptsec-$isec)) -gt 0 ] && [ $(($ptsec-$isec)) -lt 5 ]; then ans=$ptid; break; fi
+             if [ $(($ptsec-$isec)) -ge 0 ] && [ $(($ptsec-$isec)) -lt 5 ]; then ans=$ptid; break; fi
              if [ $(($isec-$ptsec)) -gt 0 ] && [ $(($isec-$ptsec)) -lt $min_gap ]; then ans=$ptid; min_gap=$(($isec-$ptsec)); fi             
          done
          echo "$ttid,$ans" >> connect.thread.$a
@@ -122,6 +124,7 @@ done
 
 # Extract relevant intervals and compute resource features  
 func="SSL_read"
+k=1
 for f in $(ls ssl.thread.*);
 do
     i=$(echo $f | cut -d'.' -f3)
@@ -157,6 +160,7 @@ do
         done
     done
     rm sslthread.$i
+    k=$(($k+1))
 done
 rm tmp.trace tmp.1 tmp.2 tmp.3
 rm resource.csv
