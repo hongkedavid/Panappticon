@@ -41,6 +41,7 @@ do
         fi  
     done
 done > thread.map
+sed 's/ //g' thread.map
 
 #########################
 rm pool12.thread
@@ -51,24 +52,43 @@ do
     fi
 done
 
-for i in $(cat trace.98 | grep CONTEXT | grep "\"I\"" | cut -d'{' -f3 | cut -d':' -f5 | cut -d',' -f1 | sort | uniq); do 
-cat thread_name.out | grep "{\"pid\":$i," | grep "Picasso\|pool\-12\-\|Retrofit\|Apptent\|IntentService\[R"; done
+for i in $(cat trace.98 | grep CONTEXT | grep "\"I\"" | cut -d'{' -f3 | cut -d':' -f5 | cut -d',' -f1 | sort | uniq);
+do 
+     cat thread_name.out | grep "{\"pid\":$i," | grep "Picasso\|pool\-12\-\|Retrofit\|Apptent\|IntentService\[R"; 
+done
 
-for ((j=2;j<=102;j=j+1)); do echo $j; 
-for i in $(cat trace.$j | grep CONTEXT | grep "\"I\"" | cut -d'{' -f3 | cut -d':' -f5 | cut -d',' -f1 | sort | uniq); 
-do cat pool12.thread | grep "{\"pid\":$i," | grep "pool\-12\-"; done; done
+for ((j=2;j<=102;j=j+1)); 
+do 
+    echo $j; 
+    for i in $(cat trace.$j | grep CONTEXT | grep "\"I\"" | cut -d'{' -f3 | cut -d':' -f5 | cut -d',' -f1 | sort | uniq); 
+    do 
+        cat pool12.thread | grep "{\"pid\":$i," | grep "pool\-12\-"; 
+    done
+done
 
 cat thread_name.out | grep "Apptentive-M" > apptent.thread
-for line in $(cat apptent.thread); do t=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); if [ $(cat fork.tid | grep "{\"pid\":$t," | wc -l) -gt 0 ]; then echo $line; fi; done > apptent.thread.tmp
+for line in $(cat apptent.thread); 
+do 
+     t=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1) 
+     if [ $(cat fork.tid | grep "{\"pid\":$t," | wc -l) -gt 0 ]; then 
+         echo $line
+     fi
+done > apptent.thread.tmp
 mv apptent.thread.tmp apptent.thread
 
 cat thread_name.out | grep "IntentService\[R" > intent.thread
-for line in $(cat intent.thread); do t=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); if [ $(cat fork.tid | grep "{\"pid\":$t," | wc -l) -gt 0 ]; then echo $line; fi; done > intent.thread.tmp
+for line in $(cat intent.thread); 
+do 
+     t=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1)
+     if [ $(cat fork.tid | grep "{\"pid\":$t," | wc -l) -gt 0 ]; then 
+         echo $line
+     fi
+done > intent.thread.tmp
 mv intent.thread.tmp intent.thread
 
 # Picasso-Idle: Thread-xxx
 # Retrofit-Idle: pool-xxx-thread-xxx 
-for f in $(cat trace.10 | grep -v 1479761249 | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq); 
+#for f in $(cat trace.10 | grep -v 1479761249 | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq); 
 for f in $(cat trace.20 | grep -v 1479762443 | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq); 
 do 
     if [ $(cat fork.tid | grep "{\"pid\":$f," | wc -l) -gt 0 ]; then 
