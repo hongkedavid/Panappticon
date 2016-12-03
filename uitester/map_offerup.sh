@@ -108,16 +108,16 @@ do
          tname=$(cat $f | grep "$t " | head -n1 | sed 's/ /,/g' | cut -d',' -f2- | sed 's/,//g' | sed 's/\[/_/g')
          line=",$a,$tname"
          echo $line
+         ans=""
          for l in $(cat thread.map | grep ",$a,"); 
          do
              l1=$(echo $l | cut -d',' -f2,3 | sed 's/\[/_/g')
              if [ $(echo $line | grep "$l1" | wc -l) -gt 0 ]; then
                 ans=$(echo $l | cut -d',' -f1)
-             else
-                ans=""
+                break
              fi
-             echo "$ttid,$ans" >> $file.$a
          done
+         echo "$ttid,$ans" >> $file.$a
      done
 done
 
