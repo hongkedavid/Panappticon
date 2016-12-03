@@ -26,6 +26,23 @@ cat $file | grep FORK | grep ",\"tgid\":$tid}}" > fork.tid
 ./sort_json.sh fork.tid
 mv sorted.fork.tid fork.tid
 
+for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
+do
+    f=$(ls $tid.$a.*traceview)
+    isec=$(cat nexus4.offerup.ui | head -n$a | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+    for f in $(cat trace.$a | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq);  
+    do      
+        if [ $(cat fork.tid | grep "{\"pid\":$f," | wc -l) -gt 0 ]; then     
+            sec=$(cat fork.tid | grep "{\"pid\":$f," | cut -d':' -f4 | cut -d',' -f1) 
+            line=$(cat thread_name.out | grep "{\"pid\":$f," | grep "$sec" | head -n1)
+            ptid=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1)
+            tname=$(echo $line | cut -d'{' -f4 | cut -d'"' -f6)
+            echo "$ptid,$a,$tname,"
+        fi  
+    done
+done > thread.map
+
+#########################
 rm pool12.thread
 for t in $(cat thread_name.out | grep "pool\-12\-thread" | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); 
 do 
@@ -58,6 +75,32 @@ do
        cat fork.tid | grep "{\"pid\":$f,"; cat thread_name.out | grep "{\"pid\":$f," | head -n1; 
     fi; 
 done
+#################################
+
+func="SSL_read"; file="ssl.thread"
+for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
+do
+     f=$(ls $tid.$a.*traceview)
+     rm $file.$a
+     for t in $(grep -n "$func" *.$a.out | cut -d':' -f1 | cut -d'.' -f1 | sort | uniq); 
+     do 
+         ttid=$(cat $f | grep "$t " | head -n1 | cut -d' ' -f1)
+         tname=$(cat $f | grep "$t " | head -n1 | sed 's/ /,/g' | cut -d',' -f2- | sed 's/,//g' | sed 's/\[/_/g')
+         line=",$a,$tname"
+         echo $line
+         for l in $(cat thread.map | grep ",$a,"); 
+         do
+             l1=$(echo $l | cut -d',' -f2,3 | sed 's/\[/_/g')
+             if [ $(echo $line | grep "$l1" | wc -l) -gt 0 ]; then
+                ans=$(echo $l | cut -d',' -f1)
+             else
+                ans=""
+             fi
+             echo "$ttid,$ans" >> $file.$a
+         done
+     done
+done
+
 
 k=1
 for line in $(cat nexus4.offerup.ui); 
