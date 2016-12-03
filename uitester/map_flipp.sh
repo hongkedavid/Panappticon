@@ -15,94 +15,6 @@ cat nexus4.user.flipp.decoded | grep UI_INPUT > $file; ./sort_json.sh $file
 for ((i=1;i<=$(cat $file | wc -l);i=i+3)); do cat $file | head -n$i | tail -n1 >> $file.tmp; done
 mv $file.tmp $file
 
-#################
-func="SSL_read"
-for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
-do
-     f=$(ls $tid.$a.*traceview)
-     echo $f
-     for t in $(grep "$func" *.$a.out | cut -d':' -f1 | cut -d'.' -f1 | sort | uniq); 
-     do 
-         cat $f | grep "$t " | head -n1; 
-     done
-done > sslread.thread
-sed -i 's/AsyncTask #/AsyncTask#/g' sslread.thread
-
-func="Posix.connect"
-for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
-do
-     f=$(ls $tid.$a.*traceview)
-     echo $f
-     for t in $(grep "$func" *.$a.out | cut -d':' -f1 | cut -d'.' -f1 | sort | uniq); 
-     do 
-         cat $f | grep "$t " | head -n1; 
-     done
-done > connect.thread
-sed -i 's/AsyncTask #/AsyncTask#/g' connect.thread
-
-for f in $(cat sslread.thread | grep -v traceview | cut -d' ' -f2 | sort | uniq); 
-do
-    for a in $(cat thread_name.out | grep "$f" | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); 
-    do 
-        for line in $(cat fork.tid | grep "{\"pid\":$a,"); do echo "$f:$line"; done
-    done
-done > sslread.map
-
-for f in $(cat connect.thread | grep -v traceview | cut -d' ' -f2 | sort | uniq); 
-do
-    for a in $(cat thread_name.out | grep "$f" | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); 
-    do 
-        for line in $(cat fork.tid | grep "{\"pid\":$a,"); do echo "$f:$line"; done
-    done
-done > connect.map
-
-func="SSL_read"; file="ssl.thread"
-for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
-do
-     f=$(ls $tid.$a.*traceview)
-     isec=$(cat nexus4.flipp.ui | head -n$a | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
-     rm $file.$a
-     for t in $(grep -n "$func" *.$a.out | cut -d':' -f1 | cut -d'.' -f1 | sort | uniq); 
-     do 
-         ttid=$(cat $f | grep "$t " | head -n1 | cut -d' ' -f1)
-         tname=$(cat $f | grep "$t " | head -n1 | sed 's/ /,/g' | cut -d',' -f2- | sed 's/,//g')
-         min_gap=10000000000
-         ans=""
-         for l in $(cat sslread.map | grep "$tname:");
-         do
-             ptsec=$(echo $l | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
-             ptid=$(echo $l | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1)
-             if [ $(($ptsec-$isec)) -ge 0 ] && [ $(($ptsec-$isec)) -lt 5 ]; then ans=$ptid; break; fi
-             if [ $(($isec-$ptsec)) -gt 0 ] && [ $(($isec-$ptsec)) -lt $min_gap ]; then ans=$ptid; min_gap=$(($isec-$ptsec)); fi             
-         done
-         echo "$ttid,$ans" >> $file.$a
-     done
-done
-
-func="Posix.connect"
-for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
-do
-     f=$(ls $tid.$a.*traceview)
-     isec=$(cat nexus4.flipp.ui | head -n$a | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
-     rm connect.thread.$a
-     for t in $(grep -n "$func" *.$a.out | cut -d':' -f1 | cut -d'.' -f1 | sort | uniq); 
-     do 
-         ttid=$(cat $f | grep "$t " | head -n1 | cut -d' ' -f1)
-         tname=$(cat $f | grep "$t " | head -n1 | sed 's/ /,/g' | cut -d',' -f2- | sed 's/,//g')
-         min_gap=10000000000
-         ans=""
-         for l in $(cat connect.map | grep "$tname:");
-         do
-             ptsec=$(echo $l | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
-             ptid=$(echo $l | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1)
-             if [ $(($ptsec-$isec)) -ge 0 ] && [ $(($ptsec-$isec)) -lt 5 ]; then ans=$ptid; break; fi
-             if [ $(($isec-$ptsec)) -gt 0 ] && [ $(($isec-$ptsec)) -lt $min_gap ]; then ans=$ptid; min_gap=$(($isec-$ptsec)); fi             
-         done
-         echo "$ttid,$ans" >> connect.thread.$a
-     done
-done
-#################
-
 # Extract relevant thread
 for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
 do
@@ -189,13 +101,21 @@ do
             cat tmp.trace | python GrepTrace.py $s1 $s2 $e1 $e2 > sslthread.$i
             if [ $(cat sslthread.$i | wc -l) -gt 0 ]; then
                fline=$(cat sslthread.$i | head -n1)
-               lc=$(grep -n "$fline" tmp.trace | cut -d':' -f1)
-               cat tmp.trace | head -n$(($lc-1)) | tail -n1 > sslthread.$i.tmp
-               cat sslthread.$i >> sslthread.$i.tmp
-               mv sslthread.$i.tmp sslthread.$i
+               ss1=$(echo $fline | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+               ss2=$(echo $fline | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1)
+               if [ $(($(($ss1*1000000))+$ss2-$(($s1*1000000))-$s2)) -gt 0 ]; then
+                  lc=$(grep -n "$fline" tmp.trace | cut -d':' -f1)
+                  cat tmp.trace | head -n$(($lc-1)) | tail -n1 > sslthread.$i.tmp
+                  cat sslthread.$i >> sslthread.$i.tmp
+                  mv sslthread.$i.tmp sslthread.$i
+               fi
                fline=$(cat sslthread.$i | tail -n1)
-               lc=$(grep -n "$fline" tmp.trace | cut -d':' -f1)
-               cat tmp.trace | head -n$(($lc+1)) | tail -n1 >> sslthread.$i
+               ss1=$(echo $fline | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+               ss2=$(echo $fline | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1)
+                if [ $(($(($e1*1000000))+$e2-$(($ss1*1000000))-$ss2)) -gt 0 ]; then
+                  lc=$(grep -n "$fline" tmp.trace | cut -d':' -f1)
+                  cat tmp.trace | head -n$(($lc+1)) | tail -n1 >> sslthread.$i
+               fi
             fi
             cat sslthread.$i | head -n1
             cat sslthread.$i | tail -n1
@@ -234,5 +154,4 @@ do
     done;
     echo -n "$c" >> resource.csv;
     echo "" >> resource.csv;
-done
-            
+done              
