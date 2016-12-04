@@ -26,7 +26,7 @@ cat $file | grep FORK | grep ",\"tgid\":$tid}}" > fork.tid
 ./sort_json.sh fork.tid
 mv sorted.fork.tid fork.tid
 
-for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
+for a in $(ls $tid.33.*traceview | cut -d'.' -f2 | sort -n); 
 do
     for f in $(cat trace.$a | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq);  
     do      
@@ -101,7 +101,7 @@ do
      f=$(ls $tid.$a.*traceview)
      rm $file.$a
      for t in $(grep -n "$func" *.$a.out | cut -d':' -f1 | cut -d'.' -f1 | sort | uniq); 
-     do 
+     do  
          ttid=$(cat $f | grep "$t " | head -n1 | cut -d' ' -f1)
          tname=$(cat $f | grep "$t " | head -n1 | sed 's/ /,/g' | cut -d',' -f2- | sed 's/,//g' | sed 's/\[/_/g')
          line=",$a,$tname"
@@ -166,8 +166,8 @@ do
         t=$(echo $line | cut -d',' -f1)
         ptid=$(echo $line | cut -d',' -f2)
         start=$(grep "ActivityThread.handleLaunchActivity" 1.$i.out | head -n1 | cut -c17-25 | sed 's/ //g')
-        psec=$(cat nexus4.flipp.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
-        pusec=$(cat nexus4.flipp.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1)
+        psec=$(cat nexus4.offerup.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+        pusec=$(cat nexus4.offerup.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1)
 #        echo $t, $start, $ptid, $psec, $pusec
         cat trace.$i | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" > tmp.trace
         cat $t.$i.out | grep $func | grep "$t ent" | cut -c18-25 | sed 's/ //g' > tmp.1
