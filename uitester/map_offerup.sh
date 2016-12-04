@@ -96,7 +96,7 @@ done
 #################################
 
 func="SSL_read"; file="ssl.thread"
-for a in $(ls $tid.99.*traceview | cut -d'.' -f2 | sort -n); 
+for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
 do
      f=$(ls $tid.$a.*traceview)
      rm $file.$a
