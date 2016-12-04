@@ -18,8 +18,6 @@ mv $file.tmp $file
 # Extract relevant thread
 for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
 do
-    f=$(ls $tid.$a.*traceview)
-    isec=$(cat nexus4.flipp.ui | head -n$a | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
     for f in $(cat trace.$a | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq);  
     do      
         if [ $(cat fork.tid | grep "{\"pid\":$f," | wc -l) -gt 0 ]; then     
