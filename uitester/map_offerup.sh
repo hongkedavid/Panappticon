@@ -112,9 +112,21 @@ do
          for l in $(cat thread.map | grep ",$a,"); 
          do
              l1=$(echo $l | cut -d',' -f2,3 | sed 's/\[/_/g')
-             if [ $(echo $line | grep "$l1" | wc -l) -gt 0 ]; then
-                ans=$(echo $l | cut -d',' -f1)
-                break
+             if [ $tname = "Picasso-Idle" ] && [ $(echo $l1 | grep "Thread\-" | wc -l) -gt 0 ] && [ $(cat $f | grep "$l1" | wc -l) -eq 0 ]; then
+                 if [ $(cat $file.$a | grep ",$(echo $l | cut -d',' -f1)" | wc -l) -eq 0 ]; then 
+                     ans=$(echo $l | cut -d',' -f1)
+                     break
+                 fi
+             elif [ $tname = "Retrofit-Idle" ] && [ $(echo $l1 | grep "pool\-" | wc -l) -gt 0 ] && [ $(cat $f | grep "$l1" | wc -l) -eq 0 ]; then
+                 if [ $(cat $file.$a | grep ",$(echo $l | cut -d',' -f1)" | wc -l) -eq 0 ]; then 
+                     ans=$(echo $l | cut -d',' -f1)
+                     break
+                 fi
+             else
+                 if [ $(echo $line | grep "$l1" | wc -l) -gt 0 ]; then
+                     ans=$(echo $l | cut -d',' -f1)
+                     break
+                 fi
              fi
          done
          echo "$ttid,$ans" >> $file.$a
