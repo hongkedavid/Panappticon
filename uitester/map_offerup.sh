@@ -26,11 +26,8 @@ cat $file | grep FORK | grep ",\"tgid\":$tid}}" > fork.tid
 ./sort_json.sh fork.tid
 mv sorted.fork.tid fork.tid
 
-#k=1
 for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
 do
-    f=$(ls $tid.$a.*traceview)
-#    isec=$(cat nexus4.offerup.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
     for f in $(cat trace.$a | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq);  
     do      
         if [ $(cat fork.tid | grep "{\"pid\":$f," | wc -l) -gt 0 ]; then     
@@ -41,7 +38,6 @@ do
             echo "$ptid,$a,$tname,"
         fi  
     done
-#    k=$(($k+1))
 done > thread.map
 sed -i 's/ //g' thread.map
 
@@ -100,7 +96,7 @@ done
 #################################
 
 func="SSL_read"; file="ssl.thread"
-for a in $(ls $tid.100.*traceview | cut -d'.' -f2 | sort -n); 
+for a in $(ls $tid.99.*traceview | cut -d'.' -f2 | sort -n); 
 do
      f=$(ls $tid.$a.*traceview)
      rm $file.$a
@@ -114,6 +110,7 @@ do
          for l in $(cat thread.map | grep ",$a,"); 
          do
              l1=$(echo $l | cut -d',' -f2,3 | sed 's/\[/_/g')
+             if [ ! $(echo $l1 | cut -d',' -f2) ]; then continue; fi
              if [ $tname = "Picasso-Idle" ] && [ $(echo $l1 | grep "Thread\-" | wc -l) -gt 0 ] && [ $(cat $f | grep "$(echo $l1 | cut -d',' -f2)" | wc -l) -eq 0 ]; then
                  echo $l1
                  if [ $(cat $file.$a | grep ",$(echo $l | cut -d',' -f1)" | wc -l) -eq 0 ]; then 
@@ -127,7 +124,8 @@ do
                      break
                  fi
              else
-                 if [ $(echo $line | grep "$l1" | wc -l) -gt 0 ]; then
+                 if [ $(echo $line | grep "$(echo $l1 | cut -d',' -f2)" | wc -l) -gt 0 ]; then
+                     echo $ttid, $l1
                      ans=$(echo $l | cut -d',' -f1)
                      break
                  fi
