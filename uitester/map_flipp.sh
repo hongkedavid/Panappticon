@@ -91,6 +91,7 @@ do
         do
             s=$(echo $l | cut -d',' -f1)
             e=$(echo $l | cut -d',' -f2)
+            if [ ! $e ]; then continue; fi
             s1=$(($(($(($psec*1000000))+$pusec+$s-$start))/1000000))
             s2=$(($(($(($psec*1000000))+$pusec+$s-$start))%1000000))
             e1=$(($(($(($psec*1000000))+$pusec+$e-$start))/1000000))
