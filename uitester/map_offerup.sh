@@ -42,6 +42,15 @@ done > thread.map
 sed -i 's/ //g' thread.map
 
 #########################
+for ((j=2;j<=102;j=j+1)); 
+do 
+    echo $j; 
+    for i in $(cat trace.$j | grep CONTEXT | grep "\"I\"" | cut -d'{' -f3 | cut -d':' -f5 | cut -d',' -f1 | sort | uniq);
+    do 
+         cat thread_name.out | grep "{\"pid\":$i," | grep "Picasso\|pool\-12\-\|Retrofit\|Apptent\|IntentService\[R"; 
+    done
+done
+
 rm pool12.thread
 for t in $(cat thread_name.out | grep "pool\-12\-thread" | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); 
 do 
@@ -49,12 +58,6 @@ do
        cat thread_name.out | grep "pool\-12\-thread" | grep "{\"pid\":$t," >> pool12.thread
     fi
 done
-
-for i in $(cat trace.98 | grep CONTEXT | grep "\"I\"" | cut -d'{' -f3 | cut -d':' -f5 | cut -d',' -f1 | sort | uniq);
-do 
-     cat thread_name.out | grep "{\"pid\":$i," | grep "Picasso\|pool\-12\-\|Retrofit\|Apptent\|IntentService\[R"; 
-done
-
 for ((j=2;j<=102;j=j+1)); 
 do 
     echo $j; 
@@ -221,6 +224,7 @@ do
     do
         t=$(echo $line | cut -d',' -f1)
         ptid=$(echo $line | cut -d',' -f2)
+        if [ ! $ptid ]; then continue; fi
         start=$(grep "ActivityThread.handleLaunchActivity" 1.$i.out | head -n1 | cut -c18-26 | sed 's/ //g')
         psec=$(cat nexus4.offerup.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
         pusec=$(cat nexus4.offerup.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1)
