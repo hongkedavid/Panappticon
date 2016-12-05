@@ -169,6 +169,7 @@ for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n);
 do
      f=$(ls $tid.$a.*traceview)
      rm $file.$a
+     touch $file.$a
      for t in $(grep -n "$func" *.$a.out | cut -d':' -f1 | cut -d'.' -f1 | sort | uniq); 
      do  
          ttid=$(cat $f | grep "$t " | head -n1 | cut -d' ' -f1)
@@ -200,6 +201,7 @@ for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n);
 do
      f=$(ls $tid.$a.*traceview)
      rm $file.$a
+     touch $file.$a
      for t in $(grep -n "$func" *.$a.out | cut -d':' -f1 | cut -d'.' -f1 | sort | uniq); 
      do  
          ttid=$(cat $f | grep "$t " | head -n1 | cut -d' ' -f1)
