@@ -84,15 +84,80 @@ do
 done > intent.thread.tmp
 mv intent.thread.tmp intent.thread
 
-# Picasso-Idle: Thread-xxx
-# Retrofit-Idle: pool-xxx-thread-xxx 
-#for f in $(cat trace.10 | grep -v 1479761249 | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq); 
-for f in $(cat trace.20 | grep -v 1479762443 | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq); 
-do 
-    if [ $(cat fork.tid | grep "{\"pid\":$f," | wc -l) -gt 0 ]; then 
-       cat fork.tid | grep "{\"pid\":$f,"; cat thread_name.out | grep "{\"pid\":$f," | head -n1; 
-    fi; 
+# Picasso-Idle: existing thread in waiting state, named Thread-xxx
+# Retrofit-Idle: newly forked thread, named Thread-xxx or pool-xxx-thread-xxx 
+for line in $(cat thread.map | grep ",$2," | grep "pool\-\|Thread\-");
+do
+    found=0
+    for l in $(cat $1.$2.*.traceview | grep "pool\-\|Thread\-" | cut -d' ' -f2);
+    do
+        c=$(echo $l | grep "$(echo $line | cut -d',' -f3)" | wc -l)
+        if [ $c -gt 0 ]; then
+           found=1
+           break
+        fi
+    done
+    if [ $found -eq 0 ]; then
+       echo $line
+    fi
+done | sed 's/,/ /g' | cut -d' ' -f1,3 | sort -n -k1 | sed 's/ /,/g' > pthread.tmp
+for i in $(ls *.$2.out | cut -d'.' -f1 | sort -n);
+do
+    t=$(cat $1.$2.*.traceview | grep "$i " | grep "Idle" | head -n1 | cut -d' ' -f1);
+    if [ ! $t ]; then continue; fi
+    if [ $t -eq $i ]; then
+       cat $1.$2.*.traceview | grep "$i " | grep "Idle" | head -n1
+    fi
+done | sed 's/ /,/g' | sort | uniq | sed 's/,/ /g' | sort -n -k1 | sed 's/ /,/g' > tthread.tmp
+rm pthread.picasso pthread.retrofit
+for line in $(cat pthread.tmp);
+do
+    if [ $(echo $line | cut -d',' -f2 | cut -d'-' -f1) = "Thread" ] && [ $(echo $line | cut -d',' -f2 | cut -d'-' -f2) -lt 540 ]; then
+       echo "$(echo $line | cut -d',' -f1),Thread $(echo $line | cut -d',' -f2 | cut -d'-' -f2)" >> pthread.picasso
+    else
+       echo "$(echo $line | cut -d',' -f1),$(echo $line | cut -d',' -f2)" >> pthread.retrofit
+    fi
 done
+sort -n -k2 pthread.picasso | sed 's/ /-/g' > pthread.picasso.tmp
+cat tthread.tmp | grep Picasso > tthread.picasso.tmp
+paste -d',' tthread.picasso.tmp pthread.picasso.tmp > picasso.tmp
+cat tthread.tmp | grep Retrofit > tthread.retrofit.tmp
+ui=$(cat nexus4.offerup.ui | head -n$(($2-1)) | tail -n1)
+s1=$(echo $ui | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+s2=$(echo $ui | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1)
+init=$(cat $1.$2.*.traceview | grep ActivityThread.handleLaunchActivity | head -n1 | cut -c18-26 | sed 's/ //g')
+rm retrofit.tmp
+if [ $(cat pthread.tmp | wc -l) -ne $(cat tthread.tmp | wc -l) ]; then
+   echo "$2"
+   for l1 in $(cat tthread.retrofit.tmp);
+   do
+       curr=$(cat $(echo $l1 | cut -d',' -f1).$2.out | head -n1 | cut -c18-26 | sed 's/ //g')
+       curr=$(($curr-$init))
+       for line in $(cat pthread.retrofit);
+       do
+           ptid=$(echo $line | cut -d',' -f1)
+           fline=$(cat trace.$2 | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" | head -n1)
+           e1=$(echo $fline | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+           e2=$(echo $fline | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1)
+           gap=$(($(($(($e1-$s1))*1000000))+$e2-$s2))
+           if [ $gap -gt $curr ]; then
+              ggap=$(($gap-$curr))
+           else
+              ggap=$(($curr-$gap))
+           fi
+           if [ $ggap -lt 500000 ]; then
+              echo "$2 $l1 $line $ggap"
+              echo "$l1,$line" >> retrofit.tmp
+              break
+           fi
+       done
+   done
+else
+   paste -d',' tthread.retrofit.tmp pthread.retrofit > retrofit.tmp
+fi
+cat picasso.tmp retrofit.tmp > picasso_retrofit.$2
+rm picasso.tmp retrofit.tmp tthread.picasso.tmp pthread.picasso.tmp tthread.retrofit.tmp
+rm tthread.tmp pthread.tmp
 #################################
 
 func="SSL_read"; file="ssl.thread"
@@ -107,30 +172,21 @@ do
          line=",$a,$tname"
          echo $line
          ans=""
-         for l in $(cat thread.map | grep ",$a,"); 
-         do
-             l1=$(echo $l | cut -d',' -f2,3 | sed 's/\[/_/g')
-             if [ ! $(echo $l1 | cut -d',' -f2) ]; then continue; fi
-             if [ $tname = "Picasso-Idle" ] && [ $(echo $l1 | grep "Thread\-" | wc -l) -gt 0 ] && [ $(cat $f | grep "$(echo $l1 | cut -d',' -f2)" | wc -l) -eq 0 ]; then
-                 echo $l1
-                 if [ $(cat $file.$a | grep ",$(echo $l | cut -d',' -f1)" | wc -l) -eq 0 ]; then 
-                     ans=$(echo $l | cut -d',' -f1)
-                     break
-                 fi
-             elif [ $tname = "Retrofit-Idle" ] && [ $(echo $l1 | grep "pool\-" | wc -l) -gt 0 ] && [ $(cat $f | grep "$(echo $l1 | cut -d',' -f2)" | wc -l) -eq 0 ]; then
-                 echo $l1
-                 if [ $(cat $file.$a | grep ",$(echo $l | cut -d',' -f1)" | wc -l) -eq 0 ]; then 
-                     ans=$(echo $l | cut -d',' -f1)
-                     break
-                 fi
-             else
+         if [ $tname = "Picasso-Idle" ] || [ $tname = "Retrofit-Idle" ]; then
+             line=$(cut -d',' -f1 picasso_retrofit.$a | grep -n "$ttid" | cut -d':' -f1)
+             ans=$(cat picasso_retrofit.$a | head -n$line | tail -n1 | cut -d',' -f3)
+         else
+             for l in $(cat thread.map | grep ",$a,"); 
+             do
+                 l1=$(echo $l | cut -d',' -f2,3 | sed 's/\[/_/g')
+                 if [ ! $(echo $l1 | cut -d',' -f2) ]; then continue; fi                               
                  if [ $(echo $line | grep "$(echo $l1 | cut -d',' -f2)" | wc -l) -gt 0 ]; then
                      echo $ttid, $l1
                      ans=$(echo $l | cut -d',' -f1)
                      break
                  fi
-             fi
-         done
+              done
+         fi     
          echo "$ttid,$ans" >> $file.$a
      done
 done
@@ -165,13 +221,13 @@ do
     do
         t=$(echo $line | cut -d',' -f1)
         ptid=$(echo $line | cut -d',' -f2)
-        start=$(grep "ActivityThread.handleLaunchActivity" 1.$i.out | head -n1 | cut -c17-25 | sed 's/ //g')
+        start=$(grep "ActivityThread.handleLaunchActivity" 1.$i.out | head -n1 | cut -c18-26 | sed 's/ //g')
         psec=$(cat nexus4.offerup.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
         pusec=$(cat nexus4.offerup.ui | head -n$k | tail -n1 | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1)
 #        echo $t, $start, $ptid, $psec, $pusec
         cat trace.$i | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" > tmp.trace
-        cat $t.$i.out | grep $func | grep "$t ent" | cut -c18-25 | sed 's/ //g' > tmp.1
-        cat $t.$i.out | grep $func | grep "$t xit" | cut -c18-25 | sed 's/ //g' > tmp.2
+        cat $t.$i.out | grep $func | grep "$t ent" | cut -c18-26 | sed 's/ //g' > tmp.1
+        cat $t.$i.out | grep $func | grep "$t xit" | cut -c18-26 | sed 's/ //g' > tmp.2
         paste -d',' tmp.1 tmp.2 > tmp.3
         for l in $(cat tmp.3);
         do
