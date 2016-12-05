@@ -26,7 +26,7 @@ cat $file | grep FORK | grep ",\"tgid\":$tid}}" > fork.tid
 ./sort_json.sh fork.tid
 mv sorted.fork.tid fork.tid
 
-for a in $(ls $tid.33.*traceview | cut -d'.' -f2 | sort -n); 
+for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
 do
     for f in $(cat trace.$a | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq);  
     do      
@@ -221,7 +221,7 @@ do
     f="$file.$i"
     rm $i.cpu_stat $i.sock_stat $i.disk_stat
     for line in $(cat $f);
-    do
+    do 
         t=$(echo $line | cut -d',' -f1)
         ptid=$(echo $line | cut -d',' -f2)
         if [ ! $ptid ]; then continue; fi
@@ -237,6 +237,7 @@ do
         do
             s=$(echo $l | cut -d',' -f1)
             e=$(echo $l | cut -d',' -f2)
+             if [ ! $e ]; then continue; fi
             s1=$(($(($(($psec*1000000))+$pusec+$s-$start))/1000000))
             s2=$(($(($(($psec*1000000))+$pusec+$s-$start))%1000000))
             e1=$(($(($(($psec*1000000))+$pusec+$e-$start))/1000000))
