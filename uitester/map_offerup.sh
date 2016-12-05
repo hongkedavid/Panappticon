@@ -207,9 +207,14 @@ do
          line=",$a,$tname"
          echo $line
          ans=""         
-         if [ $(cat ssl.thread.$a | grep "$ttid," | wc -l) -gt 0 ]; then
-             ans=$(cat ssl.thread.$a | grep "$ttid," | cut -d',' -f2)
-         else
+         for j in $(cat ssl.thread.$a | grep "$ttid,"); 
+         do
+             if [ $(echo $j | cut -d',' -f1) -eq $ttid ]; then
+                 ans=$(echo $j | cut -d',' -f2)
+                 break
+             fi
+         done
+         if [ ! $ans ]; then
              for l in $(cat thread.map | grep ",$a,"); 
              do
                  l1=$(echo $l | cut -d',' -f2,3 | sed 's/\[/_/g')
