@@ -195,6 +195,36 @@ do
      done
 done
 
+func="Posix.getaddrinfo"; file="addr.thread"
+for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
+do
+     f=$(ls $tid.$a.*traceview)
+     rm $file.$a
+     for t in $(grep -n "$func" *.$a.out | cut -d':' -f1 | cut -d'.' -f1 | sort | uniq); 
+     do  
+         ttid=$(cat $f | grep "$t " | head -n1 | cut -d' ' -f1)
+         tname=$(cat $f | grep "$t " | head -n1 | sed 's/ /,/g' | cut -d',' -f2- | sed 's/,//g' | sed 's/\[/_/g')
+         line=",$a,$tname"
+         echo $line
+         ans=""         
+         if [ $(cat ssl.thread.$a | grep "$ttid," | wc -l) -gt 0 ]; then
+             ans=$(cat ssl.thread.$a | grep "$ttid," | cut -d',' -f2)
+         else
+             for l in $(cat thread.map | grep ",$a,"); 
+             do
+                 l1=$(echo $l | cut -d',' -f2,3 | sed 's/\[/_/g')
+                 if [ ! $(echo $l1 | cut -d',' -f2) ]; then continue; fi                               
+                 if [ $(echo $line | grep "$(echo $l1 | cut -d',' -f2)" | wc -l) -gt 0 ]; then
+                     echo $ttid, $l1
+                     ans=$(echo $l | cut -d',' -f1)
+                     break
+                 fi
+              done
+         fi     
+         echo "$ttid,$ans" >> $file.$a
+     done
+done             
+
 
 # Extract relevant intervals and compute resource features  
 k=1
