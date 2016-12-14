@@ -30,7 +30,6 @@ do
      cat fork.tid | grep "{\"pid\":$f,"; 
 done > msgqueue.map
 
-
 k=1
 for line in $(cat nexus4.whereami.ui); 
 do 
@@ -47,6 +46,33 @@ do
     mv sorted.trace.$c trace.$c
     k=$(($k+1))
 done
+
+for line in $(cat thread_name.out | grep Binder); 
+do 
+    i=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); 
+    t=$(echo $line | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1); 
+    if [ $(cat fork.tid | grep "{\"pid\":$i," | grep "$t" | wc -l) -gt 0 ]; then 
+        cat thread_name.out | grep "{\"pid\":$i," | grep "$t"; 
+    fi 
+done 
+for ((i=64;i<=104;i=i+1)); 
+do 
+    t=0
+    cat trace.$i | grep "pid\":6989,\|old\":6989,\|pid\":6989}}" > tmp.trace
+    for l2 in $(cat tmp.trace | grep "pid\":6989}}" | grep WAITQUEUE_NOTIFY | grep "pid\":7006\|pid\":7008\|pid\":7007");
+    do 
+        n=$(grep -n $l2 tmp.trace | cut -d':' -f1);
+        if [ $n -le 1 ]; then continue; fi
+        l1=$(cat tmp.trace | head -n$(($n-1)) | tail -n1);
+        sec1=$(echo $l1 | cut -d'{' -f3  | cut -d':' -f2 | cut -d',' -f1)
+        usec1=$(echo $l1 | cut -d'{' -f3  | cut -d':' -f3 | cut -d'}' -f1)
+        sec2=$(echo $l2 | cut -d'{' -f3  | cut -d':' -f2 | cut -d',' -f1)
+        usec2=$(echo $l2 | cut -d'{' -f3  | cut -d':' -f3 | cut -d'}' -f1)
+        t=$(($(($(($sec2-$sec1))*1000000))+$usec2-$usec1+$t))
+    done
+    echo $i, $t
+done
+rm tmp.trace
 
 
 # Extract relevant intervals and compute resource features  
