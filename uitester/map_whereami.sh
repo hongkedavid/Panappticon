@@ -47,19 +47,21 @@ do
     k=$(($k+1))
 done
 
+tid=6989
+s="WAITQUEUE_NOTIFY"
 for line in $(cat thread_name.out | grep Binder); 
 do 
     i=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); 
     t=$(echo $line | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1); 
     if [ $(cat fork.tid | grep "{\"pid\":$i," | grep "$t" | wc -l) -gt 0 ]; then 
-        cat thread_name.out | grep "{\"pid\":$i," | grep "$t"; 
+        s=$(echo "$s\|pid\":$i,")
     fi 
 done 
-for ((i=64;i<=104;i=i+1)); 
+for i in $(cut -d' ' -f1 whereami.latency);
 do 
     t=0
-    cat trace.$i | grep "pid\":6989,\|old\":6989,\|pid\":6989}}" > tmp.trace
-    for l2 in $(cat tmp.trace | grep "pid\":6989}}" | grep WAITQUEUE_NOTIFY | grep "pid\":7006\|pid\":7008\|pid\":7007");
+    cat trace.$i | grep "pid\":$tid,\|old\":$tid,\|pid\":$tid}}" > tmp.trace
+    for l2 in $(cat tmp.trace | grep "pid\":$tid}}" | grep WAITQUEUE_NOTIFY | grep "$s");
     do 
         n=$(grep -n $l2 tmp.trace | cut -d':' -f1);
         if [ $n -le 1 ]; then continue; fi
@@ -71,7 +73,7 @@ do
         t=$(($(($(($sec2-$sec1))*1000000))+$usec2-$usec1+$t))
     done
     echo $i, $t
-done
+done > binder.stat
 rm tmp.trace
 
 
