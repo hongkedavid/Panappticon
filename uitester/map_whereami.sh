@@ -48,13 +48,17 @@ do
 done
 
 tid=6989
-s="WAITQUEUE_NOTIFY"
+s=""
 for line in $(cat thread_name.out | grep Binder); 
 do 
     i=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1); 
     t=$(echo $line | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1); 
     if [ $(cat fork.tid | grep "{\"pid\":$i," | grep "$t" | wc -l) -gt 0 ]; then 
-        s=$(echo "$s\|pid\":$i,")
+        if [ ! $s ]; then 
+           s=$(echo "pid\":$i,");
+        else 
+           s=$(echo "$s\|pid\":$i,");
+        fi
     fi 
 done 
 for i in $(cut -d' ' -f1 whereami.latency);
