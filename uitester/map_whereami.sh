@@ -61,6 +61,30 @@ do
         fi
     fi 
 done 
+
+ptid=6989
+for ((k=64;k<=104;k=k+1));
+do
+  if [ ! -e trace.$k ]; then continue; fi
+  cat trace.$k | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" > trace.$k.main
+  for i in $(grep -n "BINDER_PRODUCE_TWOWAY" trace.$k.main | cut -d':' -f1); 
+  do 
+     a=$(cat trace.$k.main | head -n$(($i+1)) | tail -n1 | cut -d'{' -f4 | cut -d':' -f3 | cut -d'}' -f1)
+     if [ $(cat nexus4.kernel.whereami.decoded | grep FORK | grep "{\"pid\":$a," | grep "tgid\":589}" | wc -l) -gt 0 ]; then
+        l=$(cat trace.$k.main | head -n$i | tail -n1);
+        sec1=$(echo $l | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+        usec1=$(echo $l | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1)
+        break
+     fi
+  done
+  l=$(cat trace.$k | grep "pid\":7006,\|pid\":7007,\|pid\":7008," | grep ":$ptid}}" | head -n1);
+  sec2=$(echo $l | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+  usec2=$(echo $l | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1) 
+  t=$(($(($(($sec2-$sec1))*1000000))+$usec2-$usec1))
+  echo $k, $sec1, $usec1, $sec2, $usec2, $t
+done > binder.stat
+#cat trace.27 | grep "pid\":1804}\|pid\":1805}\|pid\":1806}" 
+
 for i in $(cut -d' ' -f1 whereami.latency);
 do 
     t=0
