@@ -338,3 +338,16 @@ do
     echo -n "$c" >> resource.csv;
     echo "" >> resource.csv;
 done              
+
+
+# network trace validation
+c=1; 
+for l in $(cat tmp.13); 
+do 
+    s=$(echo $l | cut -d',' -f1); e=$(echo $l | cut -d',' -f2)
+    n1=$(grep -n "$s" offerup.tcpdump.out | head -n1 | cut -d':' -f1)
+    n2=$(grep -n "$e" offerup.tcpdump.out | tail -n1 | cut -d':' -f1)
+    i=$(cut -d' ' -f1 offerup.latency | head -n$c | tail -n1)
+    cat offerup.tcpdump.out | head -n$n2 | tail -n$(($n2-$n1)) | grep domain > dns.trace.$i 
+    c=$(($c+1))
+done
