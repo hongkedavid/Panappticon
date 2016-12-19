@@ -74,6 +74,19 @@ do
     cat recognize.$i.cpu | python extractCPUResource.py $ptid >> $i.cpu_stat
     cat recognize.$i.sock | python extractIOResource.py $ptid >> $i.sock_stat
     cat recognize.$i.disk | python extractIOResource.py $ptid >> $i.disk_stat
+    for l in $(cat recognize.$i | grep FORK | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1);
+    do 
+        a=$(cat trace.$i | grep "pid\":$l,\|new\":$l,\|pid\":$l}}" | head -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+        b=$(cat trace.$i | grep "pid\":$l,\|new\":$l,\|pid\":$l}}" | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+        if [ $(($b-$a)) -gt 3 ]; then
+            cat trace.$i | grep "pid\":$l,\|new\":$l,\|pid\":$l}}" > tmp.trace
+            cat tmp.trace | python GrepTrace.py $sec1 $usec1 $sec2 $usec2 > fork_recognize.$i
+            ./profile_resource.sh fork_recognize.$i
+            cat fork_recognize.$i.cpu | python extractCPUResource.py $l >> $i.cpu_stat
+            cat fork_recognize.$i.sock | python extractIOResource.py $l >> $i.sock_stat
+            cat fork_recognize.$i.disk | python extractIOResource.py $l >> $i.disk_stat
+        fi
+    done
 done
 rm tmp.trace
 rm resource.csv
@@ -104,3 +117,15 @@ do
 done
 
 
+for i in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
+do 
+    for l in $(cat recognize.$i | grep FORK | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1);
+    do 
+        a=$(cat trace.$i | grep "pid\":$l,\|new\":$l,\|pid\":$l}}" | head -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+        b=$(cat trace.$i | grep "pid\":$l,\|new\":$l,\|pid\":$l}}" | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+        if [ $(($b-$a)) -gt 3 ]; then
+            echo $i, $l
+        fi
+    done
+done
+        
