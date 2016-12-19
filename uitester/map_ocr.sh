@@ -25,3 +25,82 @@ mv sorted.fork.tid fork.tid
 
 
 # Map nativeRecognize thread in Nexus 4
+for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
+do
+    file=$(ls $tid.$a.*traceview)
+    ttid=$(cat $file | grep "nativeRecognize" | head -n1 | cut -d' ' -f1)
+    ttime=$(cat $file | grep "nativeRecognize" | head -n1 | cut -c17-25 | sed 's/ //g')
+    tname=$(cat $file | grep "$ttid " | head -n1 | cut -d' ' -f2- | sed 's/ //g')
+    echo "$a,$tname"
+done > asynctask.thread.map
+
+cat thread_name.out | grep "AsyncTask" > asynctask.thread
+for line in $(cat asynctask.thread); 
+do 
+     t=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1) 
+     if [ $(cat fork.tid | grep "{\"pid\":$t," | wc -l) -gt 0 ]; then 
+         echo $line
+     fi
+done > asynctask.thread.tmp
+mv asynctask.thread.tmp asynctask.thread
+
+for i in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
+do 
+    line=$(cat nexus4.ocr.ui | head -n$i | tail -n1)
+    sec=$(echo $line | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+    usec=$(echo $line | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1) 
+    t=$(cat ocr.latency | head -n$i | tail -n1 | cut -d' ' -f2)
+    etime=$(($(($sec*1000000))+$usec+$t))
+    end_sec=$(($etime/1000000))
+    end_usec=$(($etime%1000000))
+    rm trace.$i
+    for ((c=$sec;c<=$end_sec;c=c+1)); do cat nexus4.ocr.decoded | grep "sec\":$c," >> trace.$i; done
+    ./sort_json.sh trace.$i
+    mv sorted.trace.$i trace.$i 
+    init=$(cat $tid.$i.*traceview | grep performClick | head -n1 | cut -c17-25 | sed 's/ //g')
+    start=$(cat $tid.$i.*traceview | grep nativeRecognize | head -n1 | cut -c17-25 | sed 's/ //g')
+    end=$(cat $tid.$i.*traceview | grep nativeRecognize | tail -n1 | cut -c17-25 | sed 's/ //g')
+    ptname=$(cat asynctask.thread.map | head -n$i | tail -n1 | cut -d',' -f2)
+    ptid=$(cat asynctask.thread | grep "$ptname" | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1)
+    cat trace.$i | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" > tmp.trace
+    etime=$(($(($sec*1000000))+$usec+$start-$init))
+    sec1=$(($etime/1000000))
+    usec1=$(($etime%1000000))
+    etime=$(($(($sec*1000000))+$usec+$end-$init))
+    sec2=$(($etime/1000000))
+    usec2=$(($etime%1000000))
+    cat tmp.trace | python GrepTrace.py $sec1 $usec1 $sec2 $usec2 > recognize.$i
+    ./profile_resource.sh recognize.$i
+    cat recognize.$i.cpu | python extractCPUResource.py $ptid >> $i.cpu_stat
+    cat recognize.$i.sock | python extractIOResource.py $ptid >> $i.sock_stat
+    cat recognize.$i.disk | python extractIOResource.py $ptid >> $i.disk_stat
+done
+rm tmp.trace
+rm resource.csv
+for t in $(cat ocr.latency | cut -d' ' -f1);
+do
+   for ((j=2;j<=4;j=j+1));
+   do
+        c=0;
+        for f in $(cat $t.cpu_stat | cut -d' ' -f$j);
+        do
+            c=$(($c+$f));
+        done;
+        echo -n "$c " >> resource.csv;
+    done;
+    c=0;
+    for f in $(cat $t.sock_stat | cut -d' ' -f2);
+    do
+        c=$(($c+$f));
+    done;
+    echo -n "$c " >> resource.csv;
+    c=0
+    for f in $(cat $t.disk_stat | cut -d' ' -f2);
+    do
+        c=$(($c+$f));
+    done;
+    echo -n "$c" >> resource.csv;
+    echo "" >> resource.csv;
+done
+
+
