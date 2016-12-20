@@ -19,3 +19,7 @@ awk '{print ($2-$1)}' tmp.3 > tmp.4
 paste tmp.1 tmp.2 tmp.4 > uber.pick_latency
 rm tmp.1 tmp.2 tmp.3 tmp.4
 
+paste uber.launch_latency uber.pick_latency | cut -f1,2,4,5 | sed 's/\t/,/g' > uber.latency
+tcpdump -r uber.tcpdump ip and not host yuanyuanzhou-hp.eecs.umich.edu -n > uber.tcpdump.out 
+c=1; for l in $(cat uber.latency); do t1=$(echo $l | cut -d',' -f1 | cut -c1-7); t2=$(echo $l | cut -d',' -f2 | cut -c1-7); n1=$(grep -n "$t1" uber.tcpdump.out | head -n1 | cut -d':' -f1); n2=$(grep -n "$t1" uber.tcpdump.out | tail -n1 | cut -d':' -f1); n3=$(grep -n "$t2" uber.tcpdump.out | head -n1 | cut -d':' -f1); n4=$(grep -n "$t2" uber.tcpdump.out | tail -n1 | cut -d':' -f1); if [ ! $n1 ]; then a=$n3; b=$n4; elif [ ! $n3 ]; then a=$n1; b=$n2; else a=$n1; b=$n4; fi; cat uber.tcpdump.out | head -n$b | tail -n$(($b-$a+1)) > uber.launch_trace.$c; c=$(($c+1)); done
+c=1; for l in $(cat uber.latency); do t1=$(echo $l | cut -d',' -f3 | cut -c1-7); t2=$(echo $l | cut -d',' -f4 | cut -c1-7); n1=$(grep -n "$t1" uber.tcpdump.out | head -n1 | cut -d':' -f1); n2=$(grep -n "$t1" uber.tcpdump.out | tail -n1 | cut -d':' -f1); n3=$(grep -n "$t2" uber.tcpdump.out | head -n1 | cut -d':' -f1); n4=$(grep -n "$t2" uber.tcpdump.out | tail -n1 | cut -d':' -f1); if [ ! $n1 ]; then a=$n3; b=$n4; elif [ ! $n3 ]; then a=$n1; b=$n2; else a=$n1; b=$n4; fi; cat uber.tcpdump.out | head -n$b | tail -n$(($b-$a+1)) > uber.pick_trace.$c; c=$(($c+1)); done
