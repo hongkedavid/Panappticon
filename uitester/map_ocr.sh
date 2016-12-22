@@ -10,12 +10,15 @@ paste tmp.1 tmp.2 tmp.4 > ocr.latency
 rm tmp.1 tmp.2 tmp.3 tmp.4
 
 
+# Sort tracedump files by create time
 ls -ltU /var/folders/47/1v76mm497qvd1dkkm32bdvpm0000gn/T/ddms* | grep "Dec 22" | cut -d'/' -f7 > traceview.info 
+tid=1852
+c=$(cat traceview.info | wc -l); for f in $(cat traceview.info); do ./dmtracedump -o $f > $tid.$c.traceview; c=$(($c-1)); done 
 # In case Traceview causes update to hang
 for f in $(ls *.traceview); do i=$(echo $f | cut -d'.' -f2); a=$(cat $f | grep performClick | head -n1 | cut -c17-25 | sed 's/ //g'); b=$(cat $f | grep  "MainActivity\$16.doInBackground" | tail -n1 | cut -c17-25 | sed 's/ //g'); echo "$i $(($b-$a))"; done | sort -n -k1 | sed 's/ /,/g' > ocr.latency
 
 
-tid=2763
+tid=1852
 file="nexus4.kernel.ocr.decoded"
 cat $file | grep THREAD > thread_name.out
 ./sort_json.sh thread_name.out
