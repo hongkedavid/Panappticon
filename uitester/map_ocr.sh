@@ -1,4 +1,4 @@
-s=""; for f in $(ls *.tracedump | cut -d'.' -f1 | sort | uniq); do s=$(echo "$s""$f):\|"); done; s=$(echo "$s""MonkeyStub")
+s=""; for f in $(cat ocr.logcat | grep offline | grep triggerGlo | cut -d'(' -f2 | cut -d')' -f1 | sed 's/ //g' | sort | uniq); do s=$(echo "$s""$f):\|"); done; s=$(echo "$s""MonkeyStub")
 cat ocr.logcat | grep "$s" | grep "TouchEvent\|MonkeyStub\|StartProgress\|StopProgress" | grep LinearLayout > ocr.logcat.out 
 lc=$(cat ocr.logcat.out | wc -l)
 for ((i=1;i<=$lc;i=i+3)); do cat ocr.logcat.out | head -n$i | tail -n1 | cut -d' ' -f2 >> tmp.1; done
