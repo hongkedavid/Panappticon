@@ -15,7 +15,14 @@ ls -ltU /var/folders/47/1v76mm497qvd1dkkm32bdvpm0000gn/T/ddms* | grep "Dec 22" |
 tid=1852
 c=$(cat traceview.info | wc -l); for f in $(cat traceview.info); do ./dmtracedump -o $f > $tid.$c.traceview; c=$(($c-1)); done 
 # In case Traceview causes update to hang
-for f in $(ls *.traceview); do i=$(echo $f | cut -d'.' -f2); a=$(cat $f | grep performClick | head -n1 | cut -c17-25 | sed 's/ //g'); b=$(cat $f | grep  "MainActivity\$16.doInBackground" | tail -n1 | cut -c17-25 | sed 's/ //g'); echo "$i $(($b-$a))"; done | sort -n -k1 | sed 's/ /,/g' > ocr.latency
+for f in $(ls *.traceview); 
+do 
+    i=$(echo $f | cut -d'.' -f2) 
+    a=$(cat $f | grep performClick | head -n1 | cut -c17-25 | sed 's/ //g')
+    if [ ! $a ]; then continue; fi
+    b=$(cat $f | grep  "MainActivity\$16.doInBackground" | tail -n1 | cut -c17-25 | sed 's/ //g')
+    echo "$i $(($b-$a))"
+done | sort -n -k1 | sed 's/ /,/g' > ocr.latency
 
 
 tid=1852
