@@ -50,7 +50,8 @@ cat thread_name.out | grep "AsyncTask" > asynctask.thread
 for line in $(cat asynctask.thread); 
 do 
      t=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1) 
-     if [ $(cat fork.tid | grep "{\"pid\":$t," | wc -l) -gt 0 ]; then 
+     sec=$(echo $line | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+     if [ $(cat fork.tid | grep "{\"pid\":$t," | grep $sec | wc -l) -gt 0 ]; then 
          echo $line
      fi
 done > asynctask.thread.tmp
