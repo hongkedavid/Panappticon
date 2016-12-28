@@ -57,6 +57,13 @@ do
 done > asynctask.thread.tmp
 mv asynctask.thread.tmp asynctask.thread
 
+cat nexus4.user.ocr.decoded | grep UI_INPUT | grep "pid\":$tid," > nexus4.ocr.ui
+./sort_json.sh nexus4.ocr.ui
+mv sorted.nexus4.ocr.ui nexus4.ocr.ui
+for line in $(cat nexus4.ocr.ui); do a=$(echo $line | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1); if [ $(cat ocr_traceview.logcat.out | grep $a | wc -l) -gt 0 ]; then echo $line >> nexus4.ocr.ui.tmp; fi; done
+for line in $(cat nexus4.ocr.ui.tmp); do a=$(echo $line | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1); grep -n $a ocr_traceview.logcat.out; done
+mv nexus4.ocr.ui.tmp nexus4.ocr.ui
+
 for i in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
 do 
     line=$(cat nexus4.ocr.ui | head -n$i | tail -n1)
