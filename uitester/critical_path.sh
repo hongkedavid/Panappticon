@@ -16,7 +16,7 @@ cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -c1-2 | uniq
 
 # SSE-CPU
 c1=$(grep -n "PerformClick.run" $f | head -n1 | cut -d':' -f1)
-if [ !$c1 ]; then 
+if [ ! $c1 ]; then 
    a=$(cat $f | grep "4003 xit" | grep "MessageQueue.next" | head -n1 | cut -c1-30) 
    c1=$(grep -n "$a" $f | head -n1 | cut -d':' -f1)
 fi
@@ -30,7 +30,7 @@ cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | uniq
 
 # CNET
 c1=$(grep -n "PerformClick.run" $f | head -n1 | cut -d':' -f1)
-if [ !$c1 ]; then 
+if [ ! $c1 ]; then 
    a=$(cat $f | grep "3938 xit" | grep "MessageQueue.next" | head -n1 | cut -c1-30)
    c1=$(grep -n "$a" $f | head -n1 | cut -d':' -f1)
 fi
