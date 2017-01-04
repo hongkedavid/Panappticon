@@ -61,22 +61,22 @@ cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -c1-2 | uniq
 # Flipp
 c1=$(grep -n "ActivityThread.handleLaunchActivity" $f | head -n1 | cut -d':' -f1)
 c2=$(grep -n "performTraversals" $f | tail -n1 | cut -d':' -f1)
-cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | uniq
+cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -c1-2 | uniq
 
 # Offerup
 c1=$(grep -n "ActivityThread.handleLaunchActivity" $f | head -n1 | cut -d':' -f1)
 c2=$(grep -n "performTraversals" $f | tail -n1 | cut -d':' -f1)
-cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | uniq
+cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -c1-2 | uniq
 
 # Google Translate
 c1=$(grep -n "ActivityThread.handleResumeActivity" $f | head -n1 | cut -d':' -f1)
 c2=$(grep -n "performTraversals" $f | tail -n1 | cut -d':' -f1)
-cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | uniq
+cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -c1-2 | uniq
 
 # WhereAmI
 c1=$(grep -n "PerformClick.run" $f | head -n1 | cut -d':' -f1)
 c2=$(grep -n "performTraversals" $f | tail -n1 | cut -d':' -f1)
-cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | uniq
+cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -c1-2 | uniq
 
 # OCR
 c1=$(grep -n "PerformClick.run" $f | head -n1 | cut -d':' -f1)
