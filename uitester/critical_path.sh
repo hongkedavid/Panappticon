@@ -35,7 +35,22 @@ if [ ! $c1 ]; then
    c1=$(grep -n "$a" $f | head -n1 | cut -d':' -f1)
 fi
 c2=$(grep -n "performTraversals" $f | tail -n1 | cut -d':' -f1)
-cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | uniq
+s="3938"
+for t in $(cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | sort | uniq); 
+do 
+    if [ $t -gt 3938 ]; then 
+        line=$(cat sorted.nexus4.cnet.decoded | grep 147398685 | grep "pid\":$t}\|pid\":$t," | head -n1)
+        if [ $(echo $line | grep FUTEX_NOTIFY | wc -l) -gt 0 ]; then 
+            p1=$(echo $line | cut -d':' -f7 | cut -d',' -f1)
+            p2=$(echo $line | cut -d'{' -f4 | cut -d':' -f3 | cut -d'}' -f1)
+            if [ $t -eq $p2 ] && [ $(cat sorted.nexus4.cnet.decoded | grep 147398685 | grep "pid\":$t," | grep "ENQUEUE\|NOTIFY" | tail -n5 | grep ":$p1}}" | wc -l) -gt 0 ]; then
+               echo $t, $p1, $p2
+               s="$s\|$t"
+            fi
+        fi
+    fi
+done
+stk=""; for i in $(cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | uniq | grep "$s"); do if [ $(echo $stk | grep "$i," | wc -l) -eq 0 ]; then echo $i; stk=$(echo "$stk""$i,"); fi; done
 
 # Vine
 c1=$(grep -n "ActivityThread.handleLaunchActivity" $f | head -n1 | cut -d':' -f1)
@@ -85,3 +100,4 @@ cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -c1-2 | uniq
 
 # Get upcalls
 cat *.out | grep " \.\.\." | grep -v " \.\.\.\." 
+
