@@ -50,12 +50,28 @@ do
         fi
     fi
 done
-stk=""; for i in $(cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | uniq | grep "$s"); do if [ $(echo $stk | grep "$i," | wc -l) -eq 0 ]; then echo $i; stk=$(echo "$stk""$i,"); fi; done
+stk=""; for j in $(cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | uniq | grep "$s"); do if [ $(echo $stk | grep "$j," | wc -l) -eq 0 ]; then echo $j; stk=$(echo "$stk""$j,"); fi; done
 
 # Vine
 c1=$(grep -n "ActivityThread.handleLaunchActivity" $f | head -n1 | cut -d':' -f1)
 c2=$(grep -n "FetchRunnable" $f | tail -n1 | cut -d':' -f1)
 cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | uniq
+s="3619"
+for t in $(cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -d' ' -f1 | sort | uniq); 
+do 
+    if [ $t -gt 3619 ]; then 
+        line=$(cat sorted.nexus4.vine.decoded | grep "147275323\|147275324" | grep "pid\":$t}\|pid\":$t," | head -n1)
+        if [ $(echo $line | grep FUTEX_NOTIFY | wc -l) -gt 0 ]; then 
+            p1=$(echo $line | cut -d':' -f7 | cut -d',' -f1)
+            p2=$(echo $line | cut -d'{' -f4 | cut -d':' -f3 | cut -d'}' -f1)
+            if [ $t -eq $p2 ] && [ $(cat sorted.nexus4.vine.decoded | grep "147275323\|147275324" | grep "pid\":$t," | grep "ENQUEUE" | tail -n5 | grep ":$p1}}" | wc -l) -gt 0 ]; then
+               echo $t, $p1, $p2
+               s="$s\|$t"
+            fi
+        fi
+    fi
+done
+stk=""; for j in $(cat $f | head -n$c2 | tail -n$(($c2-$c1+1)) | cut -c1-2 | uniq | grep "$s"); do if [ $(echo $stk | grep "$j," | wc -l) -eq 0 ]; then echo $j; stk=$(echo "$stk""$j,"); fi; done
 
 # Sina
 c1=$(grep -n "ActivityThread.handleLaunchActivity" $f | head -n1 | cut -d':' -f1)
