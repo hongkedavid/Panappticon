@@ -22,6 +22,7 @@ done
 # Extract relevant thread
 for a in $(ls trace_view*.dump | cut -d'_' -f3  | cut -d'.' -f1 | sort -n); 
 do
+    if [ ! -e trace.$a ]; then continue; fi
     for f in $(cat trace.$a | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq);  
     do      
         if [ $(cat fork.tid | grep "{\"pid\":$f," | wc -l) -gt 0 ]; then     
