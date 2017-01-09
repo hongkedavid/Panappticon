@@ -19,6 +19,36 @@ cat $file | grep FORK | grep "tgid\":$tid}}" > fork.tid
 ./sort_json.sh fork.tid
 mv sorted.fork.tid fork.tid
 
+for ((k=4;k<=4;k=k+1)); 
+do 
+    a=1479708872  #1479680915  #1479679000  #1479820102
+    b=399000  #961000 #387000  #756000
+    s=$(($(($a*1000000))+$b))
+    b=$(cat translate.latency | grep "$k " | head -n1 | cut -d' ' -f2)
+    c=$k
+    e=$(($(($s+$(($b*1000))))/1000000))    
+    echo $a, $e
+    rm trace.$c
+    for ((i=$a;i<=$e;i=i+1)); do cat nexus4.translate.decoded | grep "sec\":$i," >> trace.$c; done
+    ./sort_json.sh trace.$c
+    mv sorted.trace.$c trace.$c
+done
+
+for a in $(ls $tid.*.*.traceview | cut -d'.' -f2 | sort -n);  
+do
+    if [ ! -e trace.$a ]; then continue; fi
+    for f in $(cat trace.$a | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq);  
+    do      
+        if [ $(cat fork.tid | grep "{\"pid\":$f," | wc -l) -gt 0 ]; then     
+            sec=$(cat fork.tid | grep "{\"pid\":$f," | cut -d':' -f4 | cut -d',' -f1) 
+            line=$(cat thread_name.out | grep "{\"pid\":$f," | grep "$sec" | head -n1)
+            ptid=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1)
+            tname=$(echo $line | cut -d'{' -f4 | cut -d'"' -f6)
+            echo "$ptid,$a,$tname,"
+        fi  
+    done
+done > thread.map
+
 for f in $(ls $tid.*traceview); 
 do 
     n1=$(echo $f | cut -d'.' -f2)
