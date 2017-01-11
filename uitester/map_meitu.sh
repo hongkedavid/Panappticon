@@ -1,4 +1,4 @@
-tid=2273
+tid=3286
 file="nexus4.meitu.decoded"
 cat $file | grep THREAD > thread_name.out
 ./sort_json.sh thread_name.out
