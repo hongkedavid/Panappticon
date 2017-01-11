@@ -57,6 +57,20 @@ do
 done > asynctask.thread.tmp
 mv asynctask.thread.tmp asynctask.thread
 
+for a in $(ls $tid.*traceview | cut -d'.' -f2 | sort -n); 
+do
+    for f in $(cat trace.$a | grep CONTEXT | grep "\"I\"" | cut -d':' -f7 | cut -d',' -f1 | sort -nr | uniq);  
+    do      
+        if [ $(cat fork.tid | grep "{\"pid\":$f," | wc -l) -gt 0 ]; then     
+            sec=$(cat fork.tid | grep "{\"pid\":$f," | cut -d':' -f4 | cut -d',' -f1) 
+            line=$(cat thread_name.out | grep "{\"pid\":$f," | grep "$sec" | head -n1)
+            ptid=$(echo $line | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1)
+            tname=$(echo $line | cut -d'{' -f4 | cut -d'"' -f6)
+            echo "$ptid,$a,$tname,"
+        fi  
+    done
+done > thread.map
+
 cat nexus4.user.ocr.decoded | grep UI_INPUT | grep "pid\":$tid," > nexus4.ocr.ui
 ./sort_json.sh nexus4.ocr.ui
 mv sorted.nexus4.ocr.ui nexus4.ocr.ui
