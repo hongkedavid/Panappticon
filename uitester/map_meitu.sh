@@ -7,8 +7,6 @@ cat $file | grep FORK | grep ",\"tgid\":$tid}}" > fork.tid
 ./sort_json.sh fork.tid
 mv sorted.fork.tid fork.tid
 
-sed -i 's/AsyncTask #/AsyncTask#/g' thread_name.out
-
 # Extract relevant intervals and compute resource features  
 k=1
 for line in $(cat nexus4.meitu.ui); 
