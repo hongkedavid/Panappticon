@@ -162,4 +162,23 @@ do
         fi
     done
 done
-        
+     
+    
+for j in $(cut -d',' -f1 ocr.latency);
+do 
+   rm trace.$j.cpufreq
+   for ((i=0;i<=3;i=i+1));
+   do
+       cat trace.$j | grep CPUFREQ | grep "{\"cpu\":$i," > trace.$j.cpufreq.$i
+       cat trace.$j | head -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1 > trace.$j.cpufreq.$i.tmp.1
+       cat trace.$j | head -n1 | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1 > trace.$j.cpufreq.$i.tmp.2
+       cat trace.$j.cpufreq.$i | head -n1 | cut -d'{' -f4 | cut -d':' -f3 | cut -d',' -f1 > trace.$j.cpufreq.$i.tmp.3
+       cat trace.$j.cpufreq.$i | head -n1 | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1 > trace.$j.cpufreq.$i.tmp.4
+       cut -d'{' -f3 trace.$j.cpufreq.$i | cut -d':' -f2 | cut -d',' -f1 >> trace.$j.cpufreq.$i.tmp.1
+       cut -d'{' -f3 trace.$j.cpufreq.$i | cut -d':' -f3 | cut -d'}' -f1 >> trace.$j.cpufreq.$i.tmp.2
+       cut -d'{' -f4 trace.$j.cpufreq.$i | cut -d':' -f4 | cut -d'}' -f1 >> trace.$j.cpufreq.$i.tmp.3
+       cut -d'{' -f4 trace.$j.cpufreq.$i | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1 >> trace.$j.cpufreq.$i.tmp.4
+       paste -d',' trace.$j.cpufreq.$i.tmp.1 trace.$j.cpufreq.$i.tmp.2 trace.$j.cpufreq.$i.tmp.3 trace.$j.cpufreq.$i.tmp.4 >> trace.$j.cpufreq
+       rm trace.$j.cpufreq.$i.tmp*
+   done
+done
