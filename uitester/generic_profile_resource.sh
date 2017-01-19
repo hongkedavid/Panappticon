@@ -1,3 +1,7 @@
+mkdir generic_resprof/
+mv trace.* fork.tid profile_resource.sh dtree.py extract*py generic_resprof/
+cd generic_resprof
+
 tid=6620
 for j in $(ls trace.* | cut -d'.' -f2 | sort -n);
 do 
