@@ -26,3 +26,29 @@ do
     rm thread.$j
 done
 rm tmp.trace*
+rm resource.csv
+for t in $(ls trace.* | cut -d'.' -f2 | sort -n);
+do
+    for ((j=2;j<=4;j=j+1));
+    do
+        c=0;
+        for f in $(cat $t.cpu_stat | cut -d' ' -f$j);
+        do
+            c=$(($c+$f));
+        done;
+        echo -n "$c " >> resource.csv;
+    done;
+    c=0;
+    for f in $(cat $t.sock_stat | cut -d' ' -f2);
+    do
+        c=$(($c+$f));
+    done;
+    echo -n "$c " >> resource.csv;
+    c=0
+    for f in $(cat $t.disk_stat | cut -d' ' -f2);
+    do
+        c=$(($c+$f));
+    done;
+    echo -n "$c" >> resource.csv;
+    echo "" >> resource.csv;
+done 
