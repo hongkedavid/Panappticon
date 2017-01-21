@@ -36,3 +36,4 @@ cat PACO/flow_summary_1 | grep uber | cut -d' ' -f15-18
 # tcpflow->start_time, tcpflow->ul_time, tcpflow->dl_time, tcpflow->last_tcp_ts
 cat PACO/flow_summary_1 | grep uber | cut -d' ' -f12,23,24,25
 
+k=6; for i in $(cat trace_view_$k.dump | grep SSL_read | cut -d' ' -f1 | sort | uniq); do cat trace_view_$k.dump | grep "$i " | head -n1; cat $i.$k.out | grep SSL_read; done
