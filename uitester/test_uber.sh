@@ -31,9 +31,40 @@ c=1; for l in $(cat uber.latency); do t1=$(echo $l | cut -d',' -f3 | cut -c1-7);
  
 # Parsing pcap trace uisng PACO
 ./paco 1
-# tcpflow->first_ul_pl_time, tcpflow->first_dl_pl_time, tcpflow->last_ul_pl_time, tcpflow->last_dl_pl_time,
-cat PACO/flow_summary_1 | grep uber | cut -d' ' -f15-18
-# tcpflow->start_time, tcpflow->ul_time, tcpflow->dl_time, tcpflow->last_tcp_ts
-cat PACO/flow_summary_1 | grep uber | cut -d' ' -f12,23,24,25
 
-k=6; for i in $(cat trace_view_$k.dump | grep SSL_read | cut -d' ' -f1 | sort | uniq); do cat trace_view_$k.dump | grep "$i " | head -n1; cat $i.$k.out | grep SSL_read; done
+# tcpflow->start_time, tcpflow->last_tcp_ts
+cat PACO/flow_summary_1 | grep uber | cut -d' ' -f12,25
+
+k=6; init=1485035503163000
+start=$(cat trace_view_$k.dump | grep performClick | head -n1 | cut -c20-29 | sed 's/ //g')
+for i in $(cat trace_view_$k.dump | grep SSL_do_handshake | cut -d' ' -f1 | sort | uniq); 
+do 
+    cat trace_view_$k.dump | grep "$i " | head -n1
+    for t in $(cat $i.$k.out | grep SSL_do_handshake | grep ent | cut -c20-29 | sed 's/ //g');
+    do
+        curr=$(($t-$start+$init))
+        echo "$i, $(($curr/1000000)).$(($curr%1000000))"
+    done
+done
+
+# tcpflow->first_ul_pl_time, tcpflow->first_dl_pl_time, tcpflow->last_ul_pl_time, tcpflow->last_dl_pl_time, tcpflow->ul_time, tcpflow->dl_time
+cat PACO/flow_summary_1 | grep uber | cut -d' ' -f15-18,23,24
+
+k=6; init=1485035503163000
+start=$(cat trace_view_$k.dump | grep performClick | head -n1 | cut -c20-29 | sed 's/ //g')
+for i in $(cat trace_view_$k.dump | grep SSL_read | cut -d' ' -f1 | sort | uniq); 
+do 
+    cat trace_view_$k.dump | grep "$i " | head -n1
+    c=1
+    for t in $(cat $i.$k.out | grep SSL_read | cut -c20-29 | sed 's/ //g');
+    do
+        curr=$(($t-$start+$init))
+        if [ $(($c%2)) -gt 0 ]; then
+            echo -n "$i, $(($curr/1000000)).$(($curr%1000000)) "
+        else
+            echo "$(($curr/1000000)).$(($curr%1000000))"
+        fi
+        c=$(($c+1))
+    done
+    if [ $(($c%2)) -eq 0 ]; then echo ""; fi
+done
