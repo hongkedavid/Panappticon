@@ -1,7 +1,8 @@
+# Test and analyze the app launch and destination search interaction in Uber rider app on Nexus 6
 adb shell 
+logcat -v time -f /sdcard/uber.logcat &
 su
 tcpdump -i wlan0 -w /sdcard/uber.tcpdump &
-logcat -v time -f /sdcard/uber.logcat &
 
 cat uber.logcat | grep "TouchEvent\|Monkey\|triggerGloba" | grep "TouchEvent\|Monkey\|uber" > uber.logcat.out
 for i in $(grep -n "tap 705 1160" uber.logcat.out | cut -d':' -f1); do cat uber.logcat.out | head -n$(($i+1)) | tail -n1; done | cut -d' ' -f2 > tmp.1
@@ -25,7 +26,7 @@ c=1; for l in $(cat uber.latency); do t1=$(echo $l | cut -d',' -f1 | cut -c1-7);
 c=1; for l in $(cat uber.latency); do t1=$(echo $l | cut -d',' -f3 | cut -c1-7); t2=$(echo $l | cut -d',' -f4 | cut -c1-7); n1=$(grep -n "$t1" uber.tcpdump.out | head -n1 | cut -d':' -f1); n2=$(grep -n "$t1" uber.tcpdump.out | tail -n1 | cut -d':' -f1); n3=$(grep -n "$t2" uber.tcpdump.out | head -n1 | cut -d':' -f1); n4=$(grep -n "$t2" uber.tcpdump.out | tail -n1 | cut -d':' -f1); if [ ! $n1 ]; then a=$n3; b=$n4; elif [ ! $n3 ]; then a=$n1; b=$n2; else a=$n1; b=$n4; fi; cat uber.tcpdump.out | head -n$b | tail -n$(($b-$a+1)) > uber.pick_trace.$c; c=$(($c+1)); done
 
 
-# Test and analysis step for the ride request interaction in Uber rider app
+# Test and analysis step for the ride request interaction in Uber rider app on Nexus 6
 # Start logcat
 adb shell
 logcat -v time -f /sdcard/uber_rider.logcat &
