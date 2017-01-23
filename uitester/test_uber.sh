@@ -76,7 +76,7 @@ i=$(cat ddms* | wc -l); for f in $(cat traceview.info); do ./dmtracedump -o $f >
 cat PACO/flow_summary_1 | grep com.ubercab | cut -d' ' -f12,25
 
 k=6; init=1485035503163000
-start=$(cat trace_view_$k.dump | grep performClick | head -n1 | cut -c20-29 | sed 's/ //g')
+start=$(cat trace_view_$k.dump | grep performClick | head -n1 | cut -d' ' -f2- | cut -c15-23 | sed 's/ //g')
 for i in $(cat trace_view_$k.dump | grep SSL_do_handshake | cut -d' ' -f1 | sort | uniq); 
 do 
     cat trace_view_$k.dump | grep "$i " | head -n1
@@ -92,7 +92,7 @@ done
 cat PACO/flow_summary_1 | grep com.ubercab | cut -d' ' -f15-18,23,24
 
 k=6; init=1485035503163000
-start=$(cat trace_view_$k.dump | grep performClick | head -n1 | cut -c20-29 | sed 's/ //g')
+start=$(cat trace_view_$k.dump | grep performClick | head -n1 | cut -d' ' -f2- | cut -c15-23 | sed 's/ //g')
 for i in $(cat trace_view_$k.dump | grep SSL_read | cut -d' ' -f1 | sort | uniq); 
 do 
     cat trace_view_$k.dump | grep "$i " | head -n1
