@@ -25,6 +25,7 @@ c=1; for l in $(cat uber.latency); do t1=$(echo $l | cut -d',' -f1 | cut -c1-7);
 c=1; for l in $(cat uber.latency); do t1=$(echo $l | cut -d',' -f3 | cut -c1-7); t2=$(echo $l | cut -d',' -f4 | cut -c1-7); n1=$(grep -n "$t1" uber.tcpdump.out | head -n1 | cut -d':' -f1); n2=$(grep -n "$t1" uber.tcpdump.out | tail -n1 | cut -d':' -f1); n3=$(grep -n "$t2" uber.tcpdump.out | head -n1 | cut -d':' -f1); n4=$(grep -n "$t2" uber.tcpdump.out | tail -n1 | cut -d':' -f1); if [ ! $n1 ]; then a=$n3; b=$n4; elif [ ! $n3 ]; then a=$n1; b=$n2; else a=$n1; b=$n4; fi; cat uber.tcpdump.out | head -n$b | tail -n$(($b-$a+1)) > uber.pick_trace.$c; c=$(($c+1)); done
 
 
+# Test and analysis step for the ride request interaction in Uber rider app
 # Start logcat
 adb shell
 logcat -v time -f /sdcard/uber_rider.logcat &
@@ -54,6 +55,12 @@ scp traceview.info david@rome.eecs.umich.edu:/nfs/rome2/david/uber/$pcap_folder/
 # Parsing tcpdump trace uisng PACO 
 cd /nfs/rome2/david/paco
 ./paco 1
+
+# Parsing Traceview and Panappticon trace
+cd /nfs/rome2/david/uber/$pcap_folder
+./parse_event.sh
+tid=$(cat nexus6.uber.decoded | grep com.ubercab | head -n1 | cut -d'{' -f4 | cut -d':' -f2 | cut -d',' -f1)
+i=$(cat ddms* | wc -l); for f in $(cat traceview.info); do ./dmtracedump -o $f > $tid.$i.tracedump; i=$(($i-1)); done
 
 # Map SSL_do_handshake in Traceview to fow setup in tcpdump
 # tcpflow->start_time, tcpflow->last_tcp_ts
