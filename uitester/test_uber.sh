@@ -25,13 +25,19 @@ c=1; for l in $(cat uber.latency); do t1=$(echo $l | cut -d',' -f1 | cut -c1-7);
 c=1; for l in $(cat uber.latency); do t1=$(echo $l | cut -d',' -f3 | cut -c1-7); t2=$(echo $l | cut -d',' -f4 | cut -c1-7); n1=$(grep -n "$t1" uber.tcpdump.out | head -n1 | cut -d':' -f1); n2=$(grep -n "$t1" uber.tcpdump.out | tail -n1 | cut -d':' -f1); n3=$(grep -n "$t2" uber.tcpdump.out | head -n1 | cut -d':' -f1); n4=$(grep -n "$t2" uber.tcpdump.out | tail -n1 | cut -d':' -f1); if [ ! $n1 ]; then a=$n3; b=$n4; elif [ ! $n3 ]; then a=$n1; b=$n2; else a=$n1; b=$n4; fi; cat uber.tcpdump.out | head -n$b | tail -n$(($b-$a+1)) > uber.pick_trace.$c; c=$(($c+1)); done
 
 
+# Start logcat
+adb shell
+logcat -v time -f /sdcard/uber_rider.logcat &
+
 # Using MTCPDUMP to capture traffic
- mtcpdump -i wlan0 & 
- adb pull /sdcard/IMAP/imap-2017-01-21-16-51-28/ .
+su
+mtcpdump -i wlan0 & 
  
 # Parsing pcap trace uisng PACO
+adb pull /sdcard/IMAP/imap-2017-01-21-16-51-28/ .
 ./paco 1
 
+# Map SSL_do_handshake in Traceview to fow setup in tcpdump
 # tcpflow->start_time, tcpflow->last_tcp_ts
 cat PACO/flow_summary_1 | grep uber | cut -d' ' -f12,25
 
@@ -47,6 +53,7 @@ do
     done
 done
 
+# Map SSL_read in Traceview to payload receive in tcpdump
 # tcpflow->first_ul_pl_time, tcpflow->first_dl_pl_time, tcpflow->last_ul_pl_time, tcpflow->last_dl_pl_time, tcpflow->ul_time, tcpflow->dl_time
 cat PACO/flow_summary_1 | grep uber | cut -d' ' -f15-18,23,24
 
