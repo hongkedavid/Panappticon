@@ -33,8 +33,26 @@ logcat -v time -f /sdcard/uber_rider.logcat &
 su
 mtcpdump -i wlan0 & 
  
-# Parsing pcap trace uisng PACO
-adb pull /sdcard/IMAP/imap-2017-01-21-16-51-28/ .
+# Collect tcpdump, logcat, Traceview and Panappticon traces
+# On Mac
+pcap_folder="imap-2017-01-21-16-51-28"
+mkdir $pcap_folder; cd $pcap_folder
+adb pull /sdcard/IMAP/$pcap_folder/ .
+adb pull /sdcard/uber_rider.logcat .
+scp -r $pcap_folder david@rome.eecs.umich.edu:/nfs/rome2/david/paco/uber_pp_n6/
+# On rome server
+pcap_folder="imap-2017-01-21-16-51-28"
+mkdir /nfs/rome2/david/uber/$pcap_folder; mkdir /nfs/rome2/david/uber/$pcap_folder/kernel; mkdir /nfs/rome2/david/uber/$pcap_folder/user
+scp kehong@141.212.110.134:~/panappticon-src/panappticon-tools/EventLoggingServer/bin/72d9edcfe5b9ac90d69f766364dbdd7b/kernel/148513* /nfs/rome2/david/uber/$pcap_folder/kernel/
+scp kehong@141.212.110.134:~/panappticon-src/panappticon-tools/EventLoggingServer/bin/72d9edcfe5b9ac90d69f766364dbdd7b/user/148513* /nfs/rome2/david/uber/$pcap_folder/user/
+echo "/nfs/rome2/david/paco/uber_pp_n6/$pcap_folder/traffic.cap" > /nfs/rome2/david/paco/PACO/pcapsort
+# On Mac
+ls -ltU /var/folders/47/1v76mm497qvd1dkkm32bdvpm0000gn/T/ddms* | grep "Jan 22" | cut -d'/' -f7 > traceview.info
+for f in $(cat traceview.info); do scp /var/folders/47/1v76mm497qvd1dkkm32bdvpm0000gn/T/$f david@rome.eecs.umich.edu:/nfs/rome2/david/uber/$pcap_folder/; done
+scp traceview.info david@rome.eecs.umich.edu:/nfs/rome2/david/uber/$pcap_folder/
+
+# Parsing tcpdump trace uisng PACO 
+cd /nfs/rome2/david/paco
 ./paco 1
 
 # Map SSL_do_handshake in Traceview to fow setup in tcpdump
