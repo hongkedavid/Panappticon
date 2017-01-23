@@ -36,13 +36,13 @@ mtcpdump -i wlan0 &
  
 # Collect tcpdump, logcat, Traceview and Panappticon traces
 # On Mac
-pcap_folder="imap-2017-01-21-16-51-28"
+pcap_folder="imap-2017-01-22-20-11-05"
 mkdir $pcap_folder; cd $pcap_folder
 adb pull /sdcard/IMAP/$pcap_folder/ .
 adb pull /sdcard/uber_rider.logcat .
 scp -r $pcap_folder david@rome.eecs.umich.edu:/nfs/rome2/david/paco/uber_pp_n6/
 # On rome server
-pcap_folder="imap-2017-01-21-16-51-28"
+pcap_folder="imap-2017-01-22-20-11-05"
 mkdir /nfs/rome2/david/uber/$pcap_folder; mkdir /nfs/rome2/david/uber/$pcap_folder/kernel; mkdir /nfs/rome2/david/uber/$pcap_folder/user
 scp kehong@141.212.110.134:~/panappticon-src/panappticon-tools/EventLoggingServer/bin/72d9edcfe5b9ac90d69f766364dbdd7b/kernel/148513* /nfs/rome2/david/uber/$pcap_folder/kernel/
 scp kehong@141.212.110.134:~/panappticon-src/panappticon-tools/EventLoggingServer/bin/72d9edcfe5b9ac90d69f766364dbdd7b/user/148513* /nfs/rome2/david/uber/$pcap_folder/user/
