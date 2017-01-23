@@ -61,7 +61,7 @@ cat uber_rider.logcat | grep TouchEvent | grep com.ubercab > tmp
 grep -n "TouchEvent View com.ubercab.ui.core.UButton Parent com.ubercab.ui.core.ULinearLayout\|TouchEvent View com.ubercab.ui.core.UButton Parent com.ubercab.presidio.app.optional.root.main.ride.request.plus_one.steps.surge.PlusOneSobrietyStepView" tmp > tmp.tmp 
 # DestinationSearchPromptView -> URecyclerView -> DefaultConfirmationButtonView -> com.ubercab.ui.core.UButton (-> PlusOneSobrietyStepView) -> com.ubercab.ui.core.UButton
 vi tmp.tmp
-cut -d':' -f5 tmp.tmp | cut -d' ' -f22 | cut -c1-10 > uber_rider.ui 
+cut -d':' -f5 tmp.tmp | cut -d' ' -f22 > uber_rider.ui 
 rm tmp tmp.tmp
 scp uber_rider.ui david@rome.eecs.umich.edu:/nfs/rome2/david/uber/$pcap_folder/
 
