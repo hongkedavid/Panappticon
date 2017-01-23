@@ -56,6 +56,15 @@ scp traceview.info david@rome.eecs.umich.edu:/nfs/rome2/david/uber/$pcap_folder/
 cd /nfs/rome2/david/paco
 ./paco 1
 
+# Parsing logcat trace to get input timestamp
+cat uber_rider.logcat | grep TouchEvent | grep com.ubercab > tmp
+grep -n "TouchEvent View com.ubercab.ui.core.UButton Parent com.ubercab.ui.core.ULinearLayout\|TouchEvent View com.ubercab.ui.core.UButton Parent com.ubercab.presidio.app.optional.root.main.ride.request.plus_one.steps.surge.PlusOneSobrietyStepView" tmp > tmp.tmp 
+# DestinationSearchPromptView -> URecyclerView -> DefaultConfirmationButtonView -> com.ubercab.ui.core.UButton (-> PlusOneSobrietyStepView) -> com.ubercab.ui.core.UButton
+vi tmp.tmp
+cut -d':' -f5 tmp.tmp | cut -d' ' -f22 | cut -c1-10 > uber_rider.ui 
+rm tmp tmp.tmp
+scp uber_rider.ui david@rome.eecs.umich.edu:/nfs/rome2/david/uber/$pcap_folder/
+
 # Parsing Traceview and Panappticon trace
 cd /nfs/rome2/david/uber/$pcap_folder
 ./parse_event.sh
@@ -64,7 +73,7 @@ i=$(cat ddms* | wc -l); for f in $(cat traceview.info); do ./dmtracedump -o $f >
 
 # Map SSL_do_handshake in Traceview to fow setup in tcpdump
 # tcpflow->start_time, tcpflow->last_tcp_ts
-cat PACO/flow_summary_1 | grep uber | cut -d' ' -f12,25
+cat PACO/flow_summary_1 | grep com.ubercab | cut -d' ' -f12,25
 
 k=6; init=1485035503163000
 start=$(cat trace_view_$k.dump | grep performClick | head -n1 | cut -c20-29 | sed 's/ //g')
@@ -80,7 +89,7 @@ done
 
 # Map SSL_read in Traceview to payload receive in tcpdump
 # tcpflow->first_ul_pl_time, tcpflow->first_dl_pl_time, tcpflow->last_ul_pl_time, tcpflow->last_dl_pl_time, tcpflow->ul_time, tcpflow->dl_time
-cat PACO/flow_summary_1 | grep uber | cut -d' ' -f15-18,23,24
+cat PACO/flow_summary_1 | grep com.ubercab | cut -d' ' -f15-18,23,24
 
 k=6; init=1485035503163000
 start=$(cat trace_view_$k.dump | grep performClick | head -n1 | cut -c20-29 | sed 's/ //g')
