@@ -56,11 +56,12 @@ scp traceview.info david@rome.eecs.umich.edu:/nfs/rome2/david/uber/$pcap_folder/
 # Parsing tcpdump trace uisng PACO 
 cd /nfs/rome2/david/paco
 ./paco 1
+cat PACO/flow_summary_1 | grep com.ubercab | cut -d' ' -f12,16,18,25 | grep -v "\-1.000000 \-1.000000" | sort -n -k1 > uber_flow.info
 tcpdump -r /nfs/rome2/david/paco/uber_pp_n6/$pcap_folder/traffic.cap | grep "104\.36\.192\|ord" > traffic.cap.out
 for f in $(cat traffic.cap.out | grep "IP 0587396679.wireless.umich.net." | cut -d' ' -f3 | cut -d'.' -f5 | sort | uniq); 
 do 
     cat PACO/flow_summary_1 | grep com.ubercab | grep ":$f" | cut -d' ' -f12,25; 
-done
+done | sort -n -k1
 
 # Parsing logcat trace to get input timestamp
 cat uber_rider.logcat | grep TouchEvent | grep com.ubercab > tmp
