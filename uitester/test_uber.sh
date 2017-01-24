@@ -110,3 +110,12 @@ do
     done
     if [ $(($c%2)) -eq 0 ]; then echo ""; fi
 done
+
+for ptid in $(cat flow_read.info | grep OkHttpcn | cut -d',' -f2 | sort | uniq); 
+do  
+    cat nexus6.uber.decoded | grep "pid\":$ptid,\|new\":$ptid,\|:$ptid}}" > trace.$ptid
+    n=$(cat trace.$ptid | wc -l)
+    m=$(grep -n "pid\":$ptid,\"tgid\":$tid" trace.$ptid | cut -d':' -f1)
+    cat trace.$ptid | tail -n$(($n-$m+1)) > trace.$ptid.tmp
+    mv trace.$ptid.tmp trace.$ptid
+done
