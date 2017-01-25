@@ -79,7 +79,7 @@ tid=$(cat nexus6.uber.decoded | grep com.ubercab | head -n1 | cut -d'{' -f4 | cu
 i=$(cat ddms* | wc -l); for f in $(cat traceview.info); do ./dmtracedump -o $f > $tid.$i.tracedump; i=$(($i-1)); done
 
 # Map SSL_do_handshake in Traceview to fow setup in tcpdump
-# tcpflow->start_time, tcpflow->last_tcp_ts
+# tcpflow->start_time, tcpflow->last_tcp_ts (logging code in paco/abstract/flow_abstract.cpp)
 cat PACO/flow_summary_1 | grep com.ubercab | cut -d' ' -f12,25
 
 k=6; init=1485035503163000
@@ -95,7 +95,7 @@ do
 done
 
 # Map SSL_read in Traceview to payload receive in tcpdump
-# tcpflow->first_ul_pl_time, tcpflow->first_dl_pl_time, tcpflow->last_ul_pl_time, tcpflow->last_dl_pl_time, tcpflow->ul_time, tcpflow->dl_time
+# tcpflow->first_ul_pl_time, tcpflow->first_dl_pl_time, tcpflow->last_ul_pl_time, tcpflow->last_dl_pl_time, tcpflow->ul_time, tcpflow->dl_time (logging code in paco/abstract/flow_abstract.cpp)
 cat PACO/flow_summary_1 | grep com.ubercab | cut -d' ' -f15-18,23,24
 
 k=6; init=1485035503163000
