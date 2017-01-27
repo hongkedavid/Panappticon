@@ -125,3 +125,25 @@ do
     cat trace.$ptid | tail -n$(($n-$m+1)) > trace.$ptid.tmp
     mv trace.$ptid.tmp trace.$ptid
 done
+
+for i in $(cat flow_read.info | grep ", OkHttp" | cut -d' ' -f2 | cut -d',' -f1 | sort | uniq); 
+do 
+    for t in $(cat flow_read.info | grep ", $i, OkHttp" | sed 's/ //g' | cut -d',' -f5); 
+    do 
+        tt=$(echo $t | cut -d'.' -f1); 
+        for ttt in $(cat traffic.cap.out | grep $tt | grep "https > " | cut -d' ' -f5 | sort | uniq | cut -d':' -f1); 
+        do 
+            echo "$i,$t,$ttt"
+        done
+    done
+done > OkHttp.flowsss
+for i in $(cat flow_read.info | grep ", OkHttp" | cut -d' ' -f2 | cut -d',' -f1 | sort | uniq); 
+do 
+    n=$(cat OkHttp.flowsss | grep "$i," | cut -d',' -f2 | sort | uniq | wc -l)
+    for j in $(cat OkHttp.flowsss | grep "$i," | cut -d',' -f3 | sort | uniq);
+    do
+        m=$(cat OkHttp.flowsss | grep ",$j" | wc -l)
+        if [ $m -eq $n ]; then echo "$i,$j"; fi
+    done
+done
+    
