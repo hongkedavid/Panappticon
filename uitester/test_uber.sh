@@ -142,7 +142,7 @@ do
     n=$(cat OkHttp.flowsss | grep "$i," | cut -d',' -f2 | sort | uniq | wc -l)
     for j in $(cat OkHttp.flowsss | grep "$i," | cut -d',' -f3 | sort | uniq);
     do
-        m=$(cat OkHttp.flowsss | grep ",$j" | wc -l)
+        m=$(cat OkHttp.flowsss | grep "$i," | grep ",$j" | wc -l)
         if [ $m -eq $n ]; then echo "$i,$j"; fi
     done
 done
