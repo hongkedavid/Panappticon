@@ -147,7 +147,57 @@ do
     cat trace.$ptid | tail -n$(($n-$m+1)) > trace.$ptid.tmp
     mv trace.$ptid.tmp trace.$ptid    
 done
-for l in $(cat flow_read.info.bak | grep OkHttpcn | cut -d',' -f1,2 | sort | uniq | sed 's/,/ /g' | sort -n -k1 | sed 's/ /,/g');
+
+tids="pid\":a,"
+for l in $(cat flow_read.info.bak | grep "OkHttpcn\|Thread\-" | cut -d',' -f1,2 | sort | uniq | sed 's/,/ /g' | sort -n -k1 | sed 's/ /,/g');
 do
-    
+    i=$(echo $l | cut -d',' -f1)
+    tid=$(echo $l | cut -d',' -f2)
+    tids=$(echo "$tids\|pid\":$tid,")
+    cat trace.$i | grep FUTEX_NOTIFY | grep "pid\":$tid," | cut -d'{' -f4 | cut -d':' -f3 | cut -d'}' -f1 | sort | uniq >> deptid.$i
+done
+main_tid=10747
+for i in $(cat flow_read.info.bak | cut -d',' -f1 | sort -n | uniq);
+do
+    cat deptid.$i | sort -n | uniq > deptid.$i.tmp
+    mv deptid.$i.tmp deptid.$i
+    for tid in $(cat deptid.$i);
+    do
+        for line in $(cat flow_read.info.bak | grep "$i,$tid");
+        do
+            stime=$(($(($(echo $line | cut -d',' -f4 | cut -d'.' -f1)*1000000))+$(echo $line | cut -d',' -f4 | cut -d'.' -f2)))
+            ssec=$(echo $line | cut -d',' -f4 | cut -d'.' -f1)
+            esec=$(echo $line | cut -d',' -f5 | cut -d'.' -f1)
+            if [ ! $esec ]; then
+               esec=$(cat trace.$i | tail -n1 | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1)
+               etime=$(($((esec+1))*1000000))
+            else
+               etime=$(($(($(echo $line | cut -d',' -f5 | cut -d'.' -f1)*1000000))+$(echo $line | cut -d',' -f5 | cut -d'.' -f2)))
+            fi
+            echo $line
+            for ((j=$ssec;j<=$esec;j=j+1));
+            do
+                for ttime in $(cat trace.$i | grep FUTEX_NOTIFY | grep "pid\":$tid}}" | grep "$j" | grep "$tids" | cut -d'{' -f3 | cut -d'}' -f1);
+                do
+                    sec=$(echo $ttime | cut -d':' -f2 | cut -d',' -f1)
+                    usec=$(echo $ttime | cut -d':' -f3 | cut -d'}' -f1)
+                    ttime=$(($(($sec*1000000))+$usec))
+                    if [ $(($ttime-$stime)) -gt 0 ] || [ $(($stime-$ttime)) -lt 10000 ]; then
+                       if [ $(($etime-$ttime)) -gt 0 ] || [ $(($ttime-$etime)) -lt 10000 ]; then
+                          cat trace.$i | grep FUTEX_NOTIFY | grep "pid\":$tid}}" | grep "$sec" | grep "$usec"
+                       fi
+                    fi
+                done
+            done
+            for ttime in $(cat trace.$i | grep "ENQUEUE\|FUTEX_NOTIFY" | grep "pid\":$tid," | grep $esec | grep ":$main_tid}}" | cut -d'{' -f3 | cut -d'}' -f1);
+            do
+                sec=$(echo $ttime | cut -d':' -f2 | cut -d',' -f1)
+                usec=$(echo $ttime | cut -d':' -f3 | cut -d'}' -f1)
+                ttime=$(($(($sec*1000000))+$usec))
+                if [ $(($ttime-$etime)) -gt 0 ] && [ $(($ttime-$etime)) -lt 500000 ]; then
+                    cat trace.$i | grep "ENQUEUE\|FUTEX_NOTIFY" | grep "pid\":$tid," | grep "$sec" | grep "$usec"
+                fi
+            done
+        done
+    done
 done
