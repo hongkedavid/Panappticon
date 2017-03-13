@@ -130,3 +130,36 @@ do
     echo $n1, $n2
     cat sorted.nexus4.downloadmgr.decoded | head -n$n2 | tail -n$(($n2-$n1+1)) > trace.$i
 done
+
+
+# CNET
+for ((i=1;i<=22;i=i+1)); do t1=$(cat trace_view_$i.dump | grep "PerformClick.run\|Activity.performPause" | head -n1 | cut -c20-28 | sed 's/ //g'); t2=$(cat trace_view_$i.dump | grep "ViewRootImpl.performTraversals" | tail -n1 | cut -c20-28 | sed 's/ //g'); echo "$i $(($t2-$t1))"; done > cnet.latency
+
+i=1
+for str in $(cat nexus4.cnet.ui);
+do
+    n1=$(grep -n "$str" sorted.nexus4.cnet.decoded  | cut -d':' -f1)
+    sec=$(echo $str | cut -d':' -f4 | cut -d',' -f1)
+    usec=$(echo $str | cut -d':' -f5 | cut -d'}' -f1)
+    i=$(cat cnet.latency | head -n$i | tail -n1 | cut -d' ' -f1)
+    tt=$(cat cnet.latency | head -n$i | tail -n1 | cut -d' ' -f2)
+    tt=$(($(($sec*1000000))+$tt+$usec))
+    sec=$(($tt/1000000))
+    usec=$(($tt%1000000))
+    usectmp=$(echo $usec | cut -c1)
+    n2=0
+    for str in $(cat sorted.nexus4.cnet.decoded | grep "$sec,\"usec\":$usectmp" | cut -d':' -f5 | cut -d'}' -f1);
+    do
+        if [ $usec -lt $str ]; then
+            n2=$(cat sorted.nexus4.cnet.decoded | grep -n "$sec,\"usec\":$str" | tail -n1 | cut -d':' -f1)
+            break
+        fi
+    done
+    if [ $n2 -eq 0 ]; then
+       str=$(cat sorted.nexus4.cnet.decoded | grep "$sec,\"usec\":$usectmp" | cut -d':' -f5 | cut -d'}' -f1 | tail -n1)
+       n2=$(cat sorted.nexus4.cnet.decoded | grep -n "$sec,\"usec\":$str" | tail -n1 | cut -d':' -f1)
+    fi
+    echo $n1, $n2
+    cat sorted.nexus4.cnet.decoded | head -n$n2 | tail -n$(($n2-$n1+1)) > trace.$i
+    i=$(($i+1))
+done
