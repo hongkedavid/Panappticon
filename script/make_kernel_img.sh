@@ -3,7 +3,7 @@
 #abootimg -x boot.img
 #sed -i '/bootsize =/d' bootimg.cfg
 
-# Create new boot image
+# Create new boot image (arch/arm/boot/zImage or arch/arm/boot/zImage-dtb)
 mv zImage-dtb zImage
 rm newboot.img
 abootimg --create newboot.img -f bootimg.cfg -k zImage -r initrd.img
