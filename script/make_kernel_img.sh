@@ -1,5 +1,5 @@
 # Ref at http://softwarebakery.com/building-the-android-kernel-on-linux
-# Extract a boot image
+# Extract a boot image (available from facotry image or out/target/product/xx/boot.img in Android build)
 #abootimg -x boot.img
 #sed -i '/bootsize =/d' bootimg.cfg
 
