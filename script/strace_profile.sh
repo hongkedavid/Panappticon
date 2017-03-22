@@ -15,7 +15,7 @@ strace -p $pid -T -ttt -o /sdcard/$file
 pid=4727
 fd=$(adb shell ls -l /proc/$pid/fd | grep kgsl | cut -d':' -f2 | cut -d' ' -f2)
 c=0
-for s in $(cat ocr.strace.out | grep "ioctl($fd," | cut -d'<' -f2 | cut -d'>' -f1); 
+for s in $(cat ocr.strace.out | grep "ioctl($fd," | grep ">" | grep "=" | cut -d')' -f2- | cut -d'<' -f2- | cut -d'<' -f2- | cut -d'<' -f2- | cut -d'>' -f1); 
 do 
    c=$(echo "$c + $s" | bc)
 done
