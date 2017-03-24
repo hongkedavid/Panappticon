@@ -1,4 +1,5 @@
-# Ref: https://linux.die.net/man/1/strace and https://strace.io/
+# Ref: https://linux.die.net/man/1/strace and https://strace.io/ 
+# Ref: http://www.brendangregg.com/blog/2014-05-11/strace-wow-much-syscall.html
 # Profile CPU time (spent running in the kernel) of each call
 strace -p $pid -T -o /sdcard/$file
 
