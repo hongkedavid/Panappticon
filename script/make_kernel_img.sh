@@ -15,3 +15,7 @@ abootimg --create newboot.img -f bootimg.cfg -k zImage -r initrd.img
 # Flash boot image
 adb reboot bootloader
 fastboot flash boot newboot.img
+
+# Enable dmesg to get printk output
+su
+echo 0 > /proc/sys/kernel/dmesg_restrict
