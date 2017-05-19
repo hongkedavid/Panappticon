@@ -1,4 +1,5 @@
 s=""; for f in $(cat msqrd.logcat | grep MeshHelper | cut -d'(' -f2 | cut -d')' -f1 | sed 's/ //g' | sort | uniq); do s="$f\|$s"; done; 
+#s=""; for f in $(cat msqrd.logcat | grep MeshHelper | cut -c19-24 | sed 's/ //g' | sort | uniq); do s="$f\|$s"; done; 
 s="$sTouchEvent"; cat msqrd.logcat | grep "$s" | grep "CameraControl\|TouchEvent\|MeshHelper" > msqrd.logcat.time
 nl=$(cat msqrd.logcat.time | wc -l)
 cat msqrd.logcat.time | grep TouchEvent | cut -d' ' -f2 | sed 's/://g' | sed 's/\.//g' > msqrd.logcat.tmp.1
