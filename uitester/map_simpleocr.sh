@@ -9,7 +9,7 @@ do
    for ptid in $(cat tmpid);
    do 
        if [ $(cat trace.$i | grep ":$ptid}}" | grep "pid\":1945" | grep "$tt\|$(($tt+1))" | wc -l) -gt 0 ]; then 
-           echo "$i,$f"
+           echo "$i,$ptid"
            cat trace.$i | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" > trace.$i.$ptid
        fi
    done
