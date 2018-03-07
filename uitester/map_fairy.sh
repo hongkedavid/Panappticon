@@ -26,7 +26,7 @@ do
     i=$(echo $ll | cut -d',' -f1)
     t=$(echo $ll | cut -d',' -f2)
     if [ $(ls trace.$i.* | wc -l) -eq 0 ]; then continue; fi
-    ptid=$(ls trace.$i.* | cut -d'.' -f3)
+    ptid=$(ls trace.$i.* | head -n1 | cut -d'.' -f3)
     ./profile_resource.sh trace.$i.$ptid
     rm $i.cpu_stat $i.sock_stat $i.disk_stat
     cat trace.$i.$ptid.cpu | python extractCPUResource.py $ptid >> $i.cpu_stat
