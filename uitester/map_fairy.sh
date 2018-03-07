@@ -1,4 +1,5 @@
 # Get UI input
+cat fairy.logcat | grep "TessBaseAPI\|Tesseract\|onCreate: class com.renard.ocr.documents.viewing.single.DocumentActivity\|onStop: class com.renard.ocr.documents.creation.visualisation.OCRActivity\|MonkeyStub\|Id 2131624098\|Id 16908313\|Pick Columns\|Id 2131624072\|onStop: class com.renard.ocr.documents.creation.crop.CropImageActivity" > fairy.logcat.out
 for f in $(cat fairy.logcat.out | grep TouchEvent | cut -d':' -f4 | cut -d' ' -f22 | cut -c1-10); do cat sorted.nexus4.fairy.decoded | grep UI_INPUT | grep $f; done > sorted.nexus4.fairy.ui
 
 # Segment trace
