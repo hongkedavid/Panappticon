@@ -30,14 +30,15 @@ do
 done > tmptid
 for f in $(cat sorted.nexus4.fairy.ui | cut -d':' -f4 | cut -d',' -f1); do cat tmptid | grep $f; done > thread.tid
 rm tmptid
-i=1
+k=1
 for l in $(cat sorted.nexus4.fairy.ui | cut -d':' -f4 | cut -d',' -f1); 
 do 
+    i=$(cat fairy.latency | head -n$k | tail -n1 | cut -d',' -f1)
     if [ $(cat thread.tid | grep FORK | grep $l | wc -l) -eq 1 ]; then 
        ptid=$(cat thread.tid | grep FORK | grep $l | cut -d':' -f10 | cut -d',' -f1); 
        cat trace.$i | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" > trace.$i.$ptid; 
     fi
-    i=$(($i+1)); 
+    k=$(($k+1)); 
  done 
 
 # Profile resource usage
