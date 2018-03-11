@@ -3,13 +3,14 @@ cat fairy.logcat | grep "TessBaseAPI\|Tesseract\|onCreate: class com.renard.ocr.
 for f in $(cat fairy.logcat.out | grep TouchEvent | cut -d':' -f4 | cut -d' ' -f22 | cut -c1-10); do cat sorted.nexus4.fairy.decoded | grep UI_INPUT | grep $f; done > sorted.nexus4.fairy.ui
 
 # Segment trace
+k=1
 for line in $(cat sorted.nexus4.fairy.ui); 
 do      
     a=$(echo $line | cut -d'{' -f3 | cut -d':' -f2 | cut -d',' -f1);
     b=$(echo $line | cut -d'{' -f3 | cut -d':' -f3 | cut -d'}' -f1);
     s=$(($(($a*1000000))+$b));
-    b=$(cat fairy.latency | head -n$k | tail -n1);
-    c=$k;
+    b=$(cat fairy.latency | head -n$k | tail -n1 | cut -d',' -f2);
+    c=$(cat fairy.latency | head -n$k | tail -n1 | cut -d',' -f1);
     e=$(($(($s+$(($b*1000))))/1000000));
     echo $a, $e;
     rm trace.$c;
