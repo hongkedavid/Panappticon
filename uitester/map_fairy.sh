@@ -19,7 +19,15 @@ do
 done
 
 # Extract relevant threads
-for l in $(cat thread_name.out | grep "Thread\-"); do f=$(echo $l | cut -d':' -f7 | cut -d',' -f1); t=$(echo $l | cut -d':' -f4 | cut -d',' -f1); if [ $(cat fork.tid | grep "pid\":$f," | grep $t | wc -l) -gt 0 ]; then cat thread_name.out | grep "Thread\-" | grep "pid\":$f," | grep $t; cat fork.tid | grep "pid\":$f," | grep $t; fi; done > thread.tid
+for l in $(cat thread_name.out | grep "Thread\-"); 
+do 
+    f=$(echo $l | cut -d':' -f7 | cut -d',' -f1); 
+    t=$(echo $l | cut -d':' -f4 | cut -d',' -f1); 
+    if [ $(cat fork.tid | grep "pid\":$f,\"tgid" | grep $t | wc -l) -gt 0 ]; then 
+       cat thread_name.out | grep "Thread\-" | grep "pid\":$f," | grep $t; 
+       cat fork.tid | grep "pid\":$f,\"tgid" | grep $t; 
+    fi
+done > thread.tid
 i=1; for l in $(cat sorted.nexus4.fairy.ui | cut -d':' -f4 | cut -d',' -f1); do if [ $(cat thread.tid | grep FORK | grep $l | wc -l) -eq 1 ]; then ptid=$(cat thread.tid | grep FORK | grep $l | cut -d':' -f10 | cut -d',' -f1); cat trace.$i | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" > trace.$i.$ptid; fi; i=$(($i+1)); done 
 
 # Profile resource usage
