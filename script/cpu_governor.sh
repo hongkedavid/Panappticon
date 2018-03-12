@@ -1,3 +1,4 @@
+# Ref: https://www.kernel.org/doc/Documentation/cpu-freq/user-guide.txt
 su
 echo "interactive" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 echo "interactive" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
