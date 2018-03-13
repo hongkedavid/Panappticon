@@ -54,3 +54,34 @@ do
     cat trace.$i.$ptid.sock | python extractIOResource.py $ptid >> $i.sock_stat
     cat trace.$i.$ptid.disk | python extractIOResource.py $ptid >> $i.disk_stat
 done
+
+rm resource.csv
+for ll in $(cat fairy.latency);
+do
+   t=$(echo $ll | cut -d',' -f1)
+   c=$(echo $ll | cut -d',' -f2)
+   if [ $(ls trace.$t.* | wc -l) -eq 0 ]; then continue; fi
+   echo -n "$c " >> resource.csv
+   for ((j=2;j<=4;j=j+1));
+   do
+        c=0;
+        for f in $(cat $t.cpu_stat | cut -d' ' -f$j | cut -d'.' -f1);
+        do
+            c=$(($c+$f));
+        done;
+        echo -n "$c " >> resource.csv;
+    done;
+    c=0;
+    for f in $(cat $t.sock_stat | cut -d' ' -f2);
+    do
+        c=$(($c+$f));
+    done;
+    echo -n "$c " >> resource.csv;
+    c=0
+    for f in $(cat $t.disk_stat | cut -d' ' -f2);
+    do
+        c=$(($c+$f));
+    done;
+    echo -n "$c" >> resource.csv;
+    echo "" >> resource.csv;
+done
