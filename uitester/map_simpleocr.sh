@@ -17,6 +17,7 @@ do
 done
 
 # Extrace relevant thread
+pid=$(cat sorted.nexus4.simpleocr.ui | cut -d':' -f10 | cut -d',' -f1 | head -n1);
 for l in $(cat thread_name.out | grep "AsyncTask"); 
 do 
    f=$(echo $l | cut -d':' -f7 | cut -d',' -f1); 
@@ -32,7 +33,7 @@ do
    tt=$(cat trace.$i | head -n1 | cut -d':' -f4 | cut -d',' -f1); 
    for ptid in $(cat tmpid);
    do 
-       if [ $(cat trace.$i | grep ":$ptid}}" | grep "pid\":1945" | grep "$tt\|$(($tt+1))" | wc -l) -gt 0 ]; then 
+       if [ $(cat trace.$i | grep ":$ptid}}" | grep "pid\":$pid" | grep "$tt\|$(($tt+1))" | wc -l) -gt 0 ]; then 
            echo "$i,$ptid"
            cat trace.$i | grep "pid\":$ptid,\|new\":$ptid,\|pid\":$ptid}}" > trace.$i.$ptid
        fi
