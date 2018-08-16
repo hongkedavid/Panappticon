@@ -12,3 +12,5 @@ To parse function call traces generated from app profiling (or using TraceView),
 
 To build dmtracedump tool, compile Tracedump.c and Profile.h with the following command:
     gcc -o dmtracedump TraceDump.c 
+
+Ref: https://blog.csdn.net/zero9988/article/details/52261611
