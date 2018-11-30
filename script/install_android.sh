@@ -43,3 +43,20 @@ make -j32
 cd android-5.1.1_r14/
 adb reboot bootloader
 fastboot flashall -w
+
+# Install kernel ref: http://softwarebakery.com/building-the-android-kernel-on-linux
+
+# Fix Android javadoc compilation error on tehran, refer to this
+# http://stackoverflow.com/questions/18777479/android-4-3-build-error
+# http://askubuntu.com/questions/159575/how-do-i-make-java-default-to-a-manually-installed-jre-jdk
+
+# Add javadoc
+sudo update-alternatives --install /usr/bin/javadoc javadoc /usr/lib/jvm/jdk1.6.0_45/bin/javadoc 2
+
+# Fix java version revert after "lunch"
+# export PATH=/usr/lib/jvm/java-6-oracle/bin:$PATH
+
+# Install tc
+mmm external/iproute2/tc
+adb push out/target/product/maguro/system/bin/tc /sdcard/tc
+cat /sdcard/tc > /system/bin/tc
